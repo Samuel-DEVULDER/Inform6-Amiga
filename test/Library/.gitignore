@@ -1,0 +1,16 @@
+*[A-Z]*.h
+*.z*
+*.ulx
+*.inf
+*.qzl
+*.scr
+*.blb
+*.zblb
+*.zblorb
+*.gblorb
+*.rec
+*.aux
+*.dbg
+*.swp
+*.m*
+scratch/
