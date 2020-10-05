@@ -87,7 +87,7 @@ compile: $(OBJDIR) $(EXE)
 $(OBJDIR):
 	-$(MKDIR) $(OBJDIR)
 
-$(EXE): $(OBJS)
+$(EXE): $(OBJS) $(OBJDIR)/VERstring.o
 	$(HIDDEN)$(INFO) $(NOLINE) Linking to $@...
 	$(HIDDEN)$(CC) $(LDFLAGS) $^ $(LINK_TO) $@ $(LIBS) 
 	$(HIDDEN)$(INFO) done
@@ -98,6 +98,25 @@ $(OBJDIR)/%.o: src/Inform6/%.c
 	$(HIDDEN)$(INFO) $(NOLINE) Compiling $<...
 	$(HIDDEN)$(CC) $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%) $(COMPILE_TO) "$@" "$<" 
 	$(HIDDEN)$(INFO) done
+
+$(OBJDIR)/%.o: src/Amiga/%.c
+	$(HIDDEN)$(INFO) $(NOLINE) Compiling $<...
+	$(HIDDEN)$(CC) $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%) $(COMPILE_TO) "$@" "$<" 
+	$(HIDDEN)$(INFO) done
+
+DATE         = date
+INC_REVISION = 	read n < $@; n=`expr $$n + 1`; \
+              	echo > $@ $$n; \
+              	echo >> $@ ";"; \
+              	echo >>$@ "\#define REVISION $$n"
+
+src/Amiga/VER/VERstring.h: $(OBJS)
+	$(HIDDEN)$(INFO) $(NOLINE) "Updating version string..."
+	-$(HIDDEN)$(INC_REVISION)
+	$(HIDDEN)$(INFO) done
+
+$(OBJDIR)/VERstring.o: src/Amiga/VER/VERstring.c src/Amiga/VER/VERstring.h
+	$(HIDDEN)$(CC) $(CFLAGS) $(COMPILE_TO) $@ $< $(DFLAG)DATESTR=`$(DATE) +\"%-d.%-m.%y\"` $(DFLAG)PROGNAME=$(EXE)
 	
 ###############################################################################
 # helpers
