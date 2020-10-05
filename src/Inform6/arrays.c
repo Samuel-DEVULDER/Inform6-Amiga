@@ -500,13 +500,13 @@ extern void make_global(int array_flag, int name_only)
 
     /*  Leave room to write the array size in later, if string/table array   */
     
-    int extraspace = 0;
+    {int extraspace = 0;
     if ((array_type==STRING_ARRAY) || (array_type==TABLE_ARRAY))
         extraspace += array_entry_size;
     if (array_type==BUFFER_ARRAY)
         extraspace += WORDSIZE;
 
-    int orig_area_size;
+    {int orig_area_size;
     
     if (!is_static) {
         orig_area_size = dynamic_array_area_size;
@@ -520,7 +520,7 @@ extern void make_global(int array_flag, int name_only)
     }
 
     array_types[no_arrays] = array_type;
-    array_locs[no_arrays] = is_static;
+    array_locs[no_arrays] = is_static;}}
 
     switch(data_type)
     {
@@ -673,7 +673,7 @@ advance as part of 'Zcharacter table':", unicode);
         debug_file_printf("<value>");
         write_debug_array_backpatch(svals[global_symbol]);
         debug_file_printf("</value>");
-        int32 new_area_size = (!is_static ? dynamic_array_area_size : static_array_area_size);
+        {int32 new_area_size = (!is_static ? dynamic_array_area_size : static_array_area_size);
         debug_file_printf
             ("<byte-count>%d</byte-count>",
              new_area_size - array_base);
@@ -688,7 +688,7 @@ advance as part of 'Zcharacter table':", unicode);
         write_debug_locations(get_token_location_end(beginning_debug_location));
         put_token_back();
         debug_file_printf("</array>");
-    }
+    }}
 
     if ((array_type==BYTE_ARRAY) || (array_type==WORD_ARRAY)) i--;
     if (array_type==BUFFER_ARRAY) i+=WORDSIZE-1;

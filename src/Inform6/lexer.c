@@ -950,10 +950,10 @@ extern void set_origsource_location(char *source, int32 line, int32 charnum)
     }
 
     /* Get the file number for a new or existing InputFiles entry. */
-    int file_no = register_orig_sourcefile(source);
+    {int file_no = register_orig_sourcefile(source);
 
     CurrentLB->orig_file = file_no;
-    CurrentLB->orig_source = InputFiles[file_no-1].filename;
+    CurrentLB->orig_source = InputFiles[file_no-1].filename;}
     CurrentLB->orig_line = line;
     CurrentLB->orig_char = charnum;
 }

@@ -19,8 +19,7 @@ CC           = gcc
 endif
 OS          ?= $(shell uname)
 CPU         ?= $(shell uname -m)
-EXT         ?= $(CC)-$(shell $(CC) -dumpversion)
-OBJDIR      ?= objs-$(EXT)
+
 
 MKDIR        = mkdir
 TOUCH        = touch
@@ -39,6 +38,29 @@ INFO         = @true
 HIDDEN       =
 endif
 NOLINE       = -n
+
+
+ifeq ($(OS),)
+# vbcc/sasc/etc :)
+OS           = AmigaOS
+MKDIR        = c:makedir
+TOUCH        = :ade/bin/touch  # FIXME
+NOLINE       = noline
+CAT          = c:type
+RM           = c:delete
+TMP          = t:
+NIL          = nil:
+HERE         =
+endif
+
+ifeq ($(OS), AmigaOS)
+OS           = aos
+CPU          = 60330
+DEFINES      = -DAMIGA
+endif
+
+EXT         ?= $(CC)-$(shell $(CC) -dumpversion)
+OBJDIR      ?= objs-$(EXT)
 
 EXE          = $(PROG)-$(OS)-$(CPU)-$(EXT)
 SRC          = $(wildcard src/Inform6/*.c src/amiga/*.c)

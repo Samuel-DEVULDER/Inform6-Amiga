@@ -204,7 +204,11 @@
 #define FN_SEP '/'
 /* 5 */
 #define __USE_SYSBASE
+#ifdef __GNUC__
 #include <proto/exec.h>
+#else
+#include <clib/exec_protos.h>
+#endif
 #define INCLUDE_TASK_ID
 #define Temporary_Directory "T:"
 #ifdef MAIN_INFORM_FILE
@@ -647,7 +651,10 @@ static int32 unique_task_id(void)
 /*   A large block of #define'd constant values follows.                     */
 /* ------------------------------------------------------------------------- */
 
+#undef  TRUE
 #define TRUE -1
+
+#undef  FALSE
 #define FALSE 0
 
 /* These checked the glulx_mode global during development, but are no

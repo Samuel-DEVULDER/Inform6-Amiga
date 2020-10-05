@@ -203,7 +203,7 @@ extern int register_orig_sourcefile(char *filename)
     /* This filename has never been used before. Allocate a new InputFiles
        entry. */
 
-    char *name = filename; /* no translation */
+    {char *name = filename; /* no translation */
 
     if (total_files == MAX_SOURCE_FILES)
         memoryerror("MAX_SOURCE_FILES", MAX_SOURCE_FILES);
@@ -215,7 +215,7 @@ extern int register_orig_sourcefile(char *filename)
     strcpy(filename_storage_p, name);
     InputFiles[total_files].filename = filename_storage_p;
 
-    filename_storage_p += strlen(name)+1;
+    filename_storage_p += strlen(name)+1;}
 
     if (debugfile_switch)
     {   debug_file_printf("<source index=\"%d\">", total_files);

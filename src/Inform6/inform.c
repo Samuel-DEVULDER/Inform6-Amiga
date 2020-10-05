@@ -1908,10 +1908,10 @@ static void read_command_line(int argc, char **argv)
         if (argv[i][0] == '-' && argv[i][1] == '-') {
             char *nextarg = NULL;
             if (i+1 < argc) nextarg = argv[i+1];
-            int consumed2 = execute_dashdash_command(argv[i]+2, nextarg);
+            {int consumed2 = execute_dashdash_command(argv[i]+2, nextarg);
             if (consumed2 && i+1 < argc) {
                 i++;
-            }
+            }}
         }
         else if (icl_command(argv[i])) {
             execute_icl_command(argv[i]);
