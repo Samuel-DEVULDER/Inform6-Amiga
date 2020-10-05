@@ -39,7 +39,6 @@ HIDDEN       =
 endif
 NOLINE       = -n
 
-
 ifeq ($(OS),)
 # vbcc/sasc/etc :)
 OS           = AmigaOS
@@ -53,16 +52,9 @@ NIL          = nil:
 HERE         =
 endif
 
-ifeq ($(OS), AmigaOS)
-OS           = aos
-CPU          = 60330
-DEFINES      = -DAMIGA
-endif
-
 EXT         ?= $(CC)-$(shell $(CC) -dumpversion)
 OBJDIR      ?= objs-$(EXT)
 
-EXE          = $(PROG)-$(OS)-$(CPU)-$(EXT)
 SRC          = $(wildcard src/Inform6/*.c src/amiga/*.c)
 OBJS         = $(addprefix $(OBJDIR)/,$(notdir $(SRC:%.c=%.o)))
 
@@ -75,6 +67,16 @@ LDFLAGS      =
 LIBS         = -lm
 COMPILE_TO   = -c -o
 LINK_TO      = -o
+
+ifeq ($(OS), AmigaOS)
+OS           = aos
+CPU          = 68030
+DEFINES      = -DAMIGA
+OFLAGS      += -m$(CPU) -msoft-float
+LIBS        += -noixemul
+endif
+
+EXE          = $(PROG)-$(OS)-$(CPU)-$(EXT)
 
 ###############################################################################
 # top-level targets
