@@ -1,0 +1,13 @@
+###############################################################################
+# Makefile for gcc 3.2.2 (from GG)
+###############################################################################
+
+CC = gcc3
+
+ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.322)
+MAKEFILE_LIST += Makefile.322
+endif
+
+include Makefile
+
+LDFLAGS += -m$(CPU)
