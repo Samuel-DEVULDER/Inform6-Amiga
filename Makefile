@@ -118,12 +118,14 @@ $(OBJS): $(MAKEFILE_LIST)
 
 $(OBJDIR)/%.o: src/Inform6/%.c
 	$(HIDDEN)$(INFO) $(NOLINE) Compiling $<...
-	$(HIDDEN)$(CC) $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%) $(COMPILE_TO) "$@" "$<" 
+	$(HIDDEN)$(CC) $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%) \
+		$(COMPILE_TO) "$@" "$<" 
 	$(HIDDEN)$(INFO) done
 
 $(OBJDIR)/%.o: src/Amiga/%.c
 	$(HIDDEN)$(INFO) $(NOLINE) Compiling $<...
-	$(HIDDEN)$(CC) $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%) $(COMPILE_TO) "$@" "$<" 
+	$(HIDDEN)$(CC) $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%) \
+		$(COMPILE_TO) "$@" "$<" 
 	$(HIDDEN)$(INFO) done
 
 DATE         = date
@@ -138,7 +140,8 @@ src/Amiga/VER/VERstring.h: $(OBJS)
 	$(HIDDEN)$(INFO) done
 
 $(OBJDIR)/VERstring.o: src/Amiga/VER/VERstring.c src/Amiga/VER/VERstring.h
-	$(HIDDEN)$(CC) $(CFLAGS) $(COMPILE_TO) $@ $< $(DFLAG)DATESTR=`$(DATE) +\"%-d.%-m.%y\"` $(DFLAG)PROGNAME=$(EXE)
+	$(HIDDEN)$(CC) $(CFLAGS) $(COMPILE_TO) $@ $< \
+		$(DFLAG)DATESTR=`$(DATE) +\"%-d.%-m.%y\"` $(DFLAG)PROGNAME=$(EXE)
 	
 ###############################################################################
 # helpers
