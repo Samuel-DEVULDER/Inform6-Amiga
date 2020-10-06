@@ -1,0 +1,27 @@
+###############################################################################
+# Makefile for SAS/C
+###############################################################################
+
+CC  := sc NOVER
+EXT := sasc
+
+ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.sasc)
+MAKEFILE_LIST += Makefile.sasc
+endif
+
+include Makefile
+
+LINK_TO      = LINK TO
+COMPILE_TO   = OBJNAME
+		     
+DFLAG        = DEF=
+OFLAGS       = OPT OPTSCHED OPTTIME OPTALIAS DATA=FAR CODE=FAR
+CFLAGS       = DEF inline= IDLEN=128 MATH=S STKEXT CPU=$(CPU)
+WFLAGS       = IGNORE=88 IGNORE=89 IGNORE=85 IGNORE=100 IGNORE=304 \
+               IGNORE=317 IGNORE=92 IGNORE=84 IGNORE=161
+LDFLAGS      = NOICONS
+LIBS         = MATH=S STKEXT
+
+INC_REVISION = c:eval LFORMAT="%n*n;*n\#define REVISION %n*n" TO $@ \
+               1 + `type $@` 
+POST_BUILD   = c:delete quiet \#?.lnk 
