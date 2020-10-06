@@ -20,9 +20,10 @@ endif
 OS          ?= $(shell uname)
 CPU         ?= $(shell uname -m)
 
-
 MKDIR        = mkdir
 TOUCH        = touch
+TRUE         = true
+DATE         = date
 CAT          = cat
 RM           = rm
 
@@ -34,27 +35,33 @@ ifeq ($(VERBOSE),)
 INFO         = echo
 HIDDEN       = @
 else
-INFO         = @true
+INFO         = @$(TRUE)
 HIDDEN       =
 endif
 NOLINE       = -n
 
 ifeq ($(OS),)
 # vbcc/sasc/etc :)
+NATIVE       = 1
 OS           = AmigaOS
+CAT          = c:type
+RM           = c:delete quiet
 MKDIR        = c:makedir
 TOUCH        = :ade/bin/touch  # FIXME
+DATE         = :ade/bin/date   # FIXME
+TRUE         = :ade/bin/true   # FIXME
 NOLINE       = noline
-CAT          = c:type
-RM           = c:delete
 TMP          = t:
 NIL          = nil:
 HERE         =
 endif
 
 EXT         ?= $(CC)-$(shell $(CC) -dumpversion)
-OBJDIR      ?= objs-$(EXT)
+ifeq ($(origin OBJDIR), undefined) # for some reason ?= doesn't work here
+OBJDIR      := objs-$(EXT)
+endif
 
+INF          = $(wildcard test/*.inf)
 SRC          = $(wildcard src/Inform6/*.c src/amiga/*.c)
 OBJS         = $(addprefix $(OBJDIR)/,$(notdir $(SRC:%.c=%.o)))
 
@@ -118,19 +125,18 @@ $(EXE): $(OBJS) $(OBJDIR)/VERstring.o
 	
 $(OBJS): $(MAKEFILE_LIST)
 
+COMPILE_OPTS = $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%)
+
 $(OBJDIR)/%.o: src/Inform6/%.c
 	$(HIDDEN)$(INFO) $(NOLINE) Compiling $<...
-	$(HIDDEN)$(CC) $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%) \
-		$(COMPILE_TO) "$@" "$<" 
+	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) "$@" "$<" 
 	$(HIDDEN)$(INFO) done
 
 $(OBJDIR)/%.o: src/Amiga/%.c
 	$(HIDDEN)$(INFO) $(NOLINE) Compiling $<...
-	$(HIDDEN)$(CC) $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%) \
-		$(COMPILE_TO) "$@" "$<" 
+	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) "$@" "$<" 
 	$(HIDDEN)$(INFO) done
 
-DATE         = date
 INC_REVISION = 	read n < $@; n=`expr $$n + 1`; \
               	echo > $@ $$n; \
               	echo >> $@ ";"; \
@@ -171,15 +177,27 @@ fullclean: clean
 
 do_tst_fill:
 	-$(HIDDEN)wget -q -P test -nd -r -l 1 -A inf \
+		--restrict-file-names=lowercase \
 		http://inform-fiction.org/examples/index.html
-	
-do_tst_all_%: 
-	$(eval INF = $(wildcard test/*.inf))
-	@$(MAKE) -s $(subst /,-slash-, $(addprefix do_tst_$*_, $(INF)))
+
+do_tst_all_%:
+	@$(MAKE) -s EXE=$(EXE) HIDDEN=$(HIDDEN) TMP=$(TMP) \
+		$(subst /,-slash-,$(addprefix do_tst_$*_,$(wildcard test/*.inf)))
 	
 do_tst_%:
 	$(HIDDEN)$(INFO) $(NOLINE) Testing $(subst _, , $(subst -slash-,/,$*))...
+ifeq ($(NATIVE),1)
+	$(HIDDEN)echo  >$(TMP)_$*_ "$(EXE) >$(TMP)_$* +test/Library $(TST_$*) $(subst _, , $(subst -slash-,/,$*))"
+	$(HIDDEN)echo >>$(TMP)_$*_ "SET X $$RC"
+	$(HIDDEN)echo >>$(TMP)_$*_ "IF NOT $$X EQ 0"
+	$(HIDDEN)echo >>$(TMP)_$*_ "  $(CAT) $(TMP)_$*"
+	$(HIDDEN)echo >>$(TMP)_$*_ "  QUIT $$X"
+	$(HIDDEN)echo >>$(TMP)_$*_ "ENDIF"
+	$(HIDDEN)execute $(TMP)_$*_
+	$(HIDDEN)$(RM)   $(TMP)_$*_ $(TMP)_$*
+else
 	$(HIDDEN)$(HERE)$(EXE) >$(TMP)_$* +test/Library $(TST_$*) \
-		$(subst _, , $(subst -slash-,/,$*)) || ($(CAT) $(TMP)_$* && fail)
+		$(subst _, , $(subst -slash-,/,$*)) || (echo && $(CAT) $(TMP)_$* && fail)
 	$(HIDDEN)$(RM) $(TMP)_$*
+endif
 	$(HIDDEN)$(INFO) "ok"

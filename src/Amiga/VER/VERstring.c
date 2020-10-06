@@ -1,5 +1,5 @@
 #ifdef __SASC
-#include "../Inform6/header.h"
+#include "//Inform6/header.h"
 #else
 #include "../../Inform6/header.h"
 #endif
