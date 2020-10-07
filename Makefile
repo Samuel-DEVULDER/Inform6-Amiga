@@ -43,6 +43,9 @@ NOLINE       = -n
 ifeq ($(OS),)
 # vbcc/sasc/etc :)
 NATIVE       = 1
+endif
+
+ifeq ($(NATIVE),1)
 OS           = AmigaOS
 CAT          = c:type
 RM           = c:delete quiet
@@ -129,7 +132,7 @@ COMPILE_OPTS = $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%)
 
 $(OBJDIR)/%.o: src/Inform6/%.c
 	$(HIDDEN)$(INFO) $(NOLINE) Compiling $<...
-	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) "$@" "$<" 
+	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) "$@" "$<" $(COMPILE_EXTRA)
 	$(HIDDEN)$(INFO) done
 
 $(OBJDIR)/%.o: src/Amiga/%.c
@@ -137,10 +140,15 @@ $(OBJDIR)/%.o: src/Amiga/%.c
 	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) "$@" "$<" 
 	$(HIDDEN)$(INFO) done
 
+ifeq ($(NATIVE),1)
+INC_REVISION = c:eval LFORMAT="%n*n;*n\#define REVISION %n*n" TO $@ \
+               1 + `type $@` 
+else
 INC_REVISION = 	read n < $@; n=`expr $$n + 1`; \
               	echo > $@ $$n; \
               	echo >> $@ ";"; \
               	echo >>$@ "\#define REVISION $$n"
+endif
 
 src/Amiga/VER/VERstring.h: $(OBJS)
 	$(HIDDEN)$(INFO) $(NOLINE) "Updating version string..."

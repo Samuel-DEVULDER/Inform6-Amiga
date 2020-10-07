@@ -1,0 +1,17 @@
+##############################################################################
+# Makefile for vbcc targetting ppc MorphOS
+##############################################################################
+
+CC     := vc +morphos
+OS     := morphos
+CPU    := ppc
+OBJDIR := obj$(CPU)
+NATIVE := 1
+
+ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.vbcc-mos)
+MAKEFILE_LIST += Makefile.vbcc-mos
+endif
+include Makefile.vbcc
+
+LIBS    = -lamiga -lm
+OFLAGS += -use-lmw

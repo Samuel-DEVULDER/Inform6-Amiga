@@ -22,6 +22,4 @@ WFLAGS       = IGNORE=88 IGNORE=89 IGNORE=85 IGNORE=100 IGNORE=304 \
 LDFLAGS      = NOICONS
 LIBS         = MATH=S STKEXT
 
-INC_REVISION = c:eval LFORMAT="%n*n;*n\#define REVISION %n*n" TO $@ \
-               1 + `type $@` 
 POST_BUILD   = c:delete quiet \#?.lnk 
