@@ -25,7 +25,7 @@ WFLAGS := -dontwarn=153 -dontwarn=175
 LDFLAGS =
 LIBS    = -lamiga -lmsoft
 
-GREP = :ade/bin/grep # fixme
+GREP = :ade/bin/grep # FIXME
 COMPILE_EXTRA = | $(GREP) -v  "warning 120 " | $(GREP) -v  ">{" | $(GREP) -v  ">extern"
 
 # These file take too much memory to compile with -O3, so we reduce optim level a bit
