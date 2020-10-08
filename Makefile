@@ -59,7 +59,7 @@ NIL          = nil:
 HERE         =
 endif
 
-EXT         ?= $(CC)-$(shell $(CC) -dumpversion)
+EXT         ?= $(notdir $(CC))-$(shell $(CC) -dumpversion)
 ifeq ($(origin OBJDIR), undefined) # for some reason ?= doesn't work here
 OBJDIR      := objs-$(EXT)
 endif
@@ -83,7 +83,7 @@ OS           = aos
 CPU          = 68030
 DEFINES      = -DAMIGA
 OFLAGS      += -m$(CPU) -msoft-float
-LIBS        += -noixemul
+LIBS        += -lstack -noixemul
 endif
 
 EXE          = $(PROG)-$(OS)-$(CPU)-$(EXT)
@@ -92,9 +92,42 @@ EXE          = $(PROG)-$(OS)-$(CPU)-$(EXT)
 # top-level targets
 ###############################################################################
 
+ifeq ($(NATIVE)$(firstword $(MAKEFILE_LIST)),1Makefile)
+unknown: all
+	
+%:
+	$(HIDDEN)echo >$(TMP)_  ""
+	$(HIDDEN)echo >>$(TMP)_  "FailAt 21"
+	$(HIDDEN)echo >>$(TMP)_ "echo >T:t.c f() {}"
+	$(HIDDEN)echo >>$(TMP)_ "sc NOVER >NIL: T:t.c OBJNAME T:t.o"
+	$(HIDDEN)echo >>$(TMP)_ "IF *$$RC eq 10"
+	$(HIDDEN)echo >>$(TMP)_ "  vbccm68k >NIL:"
+	$(HIDDEN)echo >>$(TMP)_ "  IF *$$RC eq 10"
+	$(HIDDEN)echo >>$(TMP)_ "    vbccppc >NIL:"
+	$(HIDDEN)echo >>$(TMP)_ "    IF *$$RC eq 10"
+	$(HIDDEN)echo >>$(TMP)_ "      echo Can't determine compiler"
+	$(HIDDEN)echo >>$(TMP)_ "      quit 20"
+	$(HIDDEN)echo >>$(TMP)_ "    ELSE"
+	$(HIDDEN)echo >>$(TMP)_ "      set MAKEFIlE=Makefile.vbcc-mos"
+	$(HIDDEN)echo >>$(TMP)_ "    ENDIF"
+	$(HIDDEN)echo >>$(TMP)_ "  ELSE"
+	$(HIDDEN)echo >>$(TMP)_ "    set MAKEFIlE=Makefile.vbcc-aos"
+	$(HIDDEN)echo >>$(TMP)_ "  ENDIF"
+	$(HIDDEN)echo >>$(TMP)_ "ELSE"
+	$(HIDDEN)echo >>$(TMP)_ "  set MAKEFIlE=Makefile.sasc"
+	$(HIDDEN)echo >>$(TMP)_ "ENDIF"
+	$(HIDDEN)echo >>$(TMP)_ "DELETE QUIET T:t.o T:t.c"
+	$(HIDDEN)echo >>$(TMP)_ "$(MAKE) -f *$$MAKEFILE VERBOSE=$(VERBOSE) $@"
+	$(HIDDEN)echo >>$(TMP)_ "quit $$RC"
+	$(HIDDEN)c:execute $(TMP)_
+	$(HIDDEN)$(RM) $(TMP)_
+else
 all: compile
 
 tst: compile do_tst_fill do_tst_-h do_tst_all_-v5
+
+endif
+
 
 ###############################################################################
 # git-suff
@@ -122,8 +155,9 @@ $(OBJDIR):
 	-$(MKDIR) $(OBJDIR)
 
 $(EXE): $(OBJS) $(OBJDIR)/VERstring.o
-	$(HIDDEN)$(INFO) $(NOLINE) Linking to $@...
+	$(HIDDEN)$(INFO) $(NOLINE) "Linking to $@..."
 	$(HIDDEN)$(CC) $(LDFLAGS) $^ $(LINK_TO) $@ $(LIBS) 
+	$(HIDDEN)$(POST_BUILD)
 	$(HIDDEN)$(INFO) done
 	
 $(OBJS): $(MAKEFILE_LIST)
@@ -131,7 +165,7 @@ $(OBJS): $(MAKEFILE_LIST)
 COMPILE_OPTS = $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%)
 
 $(OBJDIR)/%.o: src/Inform6/%.c
-	$(HIDDEN)$(INFO) $(NOLINE) Compiling $<...
+	$(HIDDEN)$(INFO) $(NOLINE) "Compiling $< with $(CC)..."
 	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) "$@" "$<" $(COMPILE_EXTRA)
 	$(HIDDEN)$(INFO) done
 
@@ -166,8 +200,8 @@ $(OBJDIR)/VERstring.o: src/Amiga/VER/VERstring.c src/Amiga/VER/VERstring.h
 relink: touch compile
 
 touch:
-	$(TOUCH) $(OBJDIR)/*.o 
 	$(TOUCH) $(MAKEFILE_LIST)
+	$(TOUCH) $(OBJDIR)/*.o 
 
 ###############################################################################
 # cleaning
