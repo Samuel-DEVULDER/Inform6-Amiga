@@ -40,7 +40,7 @@ RM           = rm >$(NIL) 2>&1
 # sets NATIVE to 1 when running out of unix context 
 ifeq ($(OS),)
 NATIVE       = 1
-OS           = AmigaOS 
+OS          := AmigaOS
 endif
 
 # replace unix commands by amiga (native) ones 
@@ -89,9 +89,9 @@ COMPILE_TO   = -c -o
 LINK_TO      = -o
 
 # Default AMIGA options
-ifeq ($(OS), AmigaOS)
-OS           = aos
-CPU          = 68030
+ifeq ($(OS),AmigaOS)
+OS          := aos
+CPU         := 68030
 DEFINES      = -DAMIGA
 OFLAGS      += -m$(CPU) -msoft-float
 LIBS        += -lstack -noixemul
@@ -219,7 +219,7 @@ src/Amiga/VER/VERstring.h: $(OBJS)
 	$(HIDDEN)$(INFO) done
 
 $(OBJDIR)/VERstring.o: src/Amiga/VER/VERstring.c src/Amiga/VER/VERstring.h
-	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) $@ $< \
+	$(HIDDEN)$(CC) $(CFLAGS) $(COMPILE_TO) $@ $< \
 		$(DFLAG)DATESTR=`$(DATE) +\"%-d.%-m.%y\"` $(DFLAG)PROGNAME=$(EXE)
 	
 ###############################################################################
@@ -282,11 +282,12 @@ endif
 
 %_all all_%: sc_% vbcc_% ade_% gg_%
 	@rm t:_ >NIL:
-	@$(INFO) done "$*" wil all compîlers...
+	@$(INFO) done "$*" wil all compilers...
 
 vbcc_%:
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "assign c: vbcc:bin add"
+	@echo >> t:_ "Mount pipe: >NIL:"
 	@echo >> t:_ "$(MAKE) -f Makefile.vbcc-aos $* VERBOSE=$(VERBOSE)"
 	@echo >> t:_ "$(MAKE) -f Makefile.vbcc-mos $* VERBOSE=$(VERBOSE)"
 	@echo >> t:_ "assign c: vbcc:bin remove"
@@ -308,7 +309,7 @@ ade_%:
 	@echo >> t:_ "assign lib:  ade:lib remove"
 	@echo >> t:_ "assign lib:  ade:local/lib remove"
 	@echo >> t:_ "assign bin:  ade:bin remove"
-	@echo >> t:_ "assign bin:  application:gg/bin remove"
+	@echo >> t:_ "assign bin:  Applications:gg/bin remove"
 	@c:execute t:_
 	@c:delete t:_
 
@@ -324,7 +325,7 @@ gg_%:
 	@echo >> t:_ "assign devs: gg:sys/devs remove"
 	@echo >> t:_ "assign libs: gg:sys/libs remove"	
 	@c:execute t:_
-#	@c:delete t:_
+	@c:delete t:_
 
 sc_%:
 	@echo >  t:_ "FailAt 20"
