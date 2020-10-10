@@ -2,7 +2,7 @@
 # Makefile for gcc 2.9.5 (from ADE)
 ##############################################################################
 
-CC  = gcc295
+CC  = ADE:bin/gcc
 
 ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.295)
 MAKEFILE_LIST += Makefile.295

@@ -2,7 +2,8 @@
 # Makefile for gcc 3.2.2 (from GG)
 ###############################################################################
 
-CC = gcc3
+CC  := gg:bin/gcc
+OS  := AmigaOS
 
 ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.322)
 MAKEFILE_LIST += Makefile.322
