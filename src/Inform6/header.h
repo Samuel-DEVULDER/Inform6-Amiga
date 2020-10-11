@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------- */
 /*   Header file for Inform:  Z-machine ("Infocom" format) compiler          */
 /*                                                                           */
-/*                              Inform 6.35                                  */
+/*                              Inform 6.34                                  */
 /*                                                                           */
 /*   This header file and the others making up the Inform source code are    */
 /*   copyright (c) Graham Nelson 1993 - 2020                                 */
@@ -30,9 +30,8 @@
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
 
-/* For releases, set to the release date in the form "1st January 2000" */
-#define RELEASE_DATE "in development"
-#define RELEASE_NUMBER 1635
+#define RELEASE_DATE "21st May 2020"
+#define RELEASE_NUMBER 1634
 #define GLULX_RELEASE_NUMBER 38
 #define MODULE_VERSION_NUMBER 1
 #define VNUMBER RELEASE_NUMBER
@@ -481,17 +480,12 @@ static int32 unique_task_id(void)
 #define Transcript_File "gametext"
 #endif
 #endif
-
 #ifndef Debugging_File
 #ifdef FILE_EXTENSIONS
 #define Debugging_File "gameinfo.dbg"
 #else
 #define Debugging_File "gamedebug"
 #endif
-#endif
-
-#ifndef Default_Language
-#define Default_Language "English"
 #endif
 
 #ifdef FILE_EXTENSIONS
