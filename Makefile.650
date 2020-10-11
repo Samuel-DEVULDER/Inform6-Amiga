@@ -1,0 +1,17 @@
+###############################################################################
+# Makefile for gcc 6.5.0b (from Bebbo)
+###############################################################################
+
+CC  := /opt/amiga/bin/m68k-amigaos-gcc
+OS  := AmigaOS
+
+ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.650)
+MAKEFILE_LIST += Makefile.650
+endif
+
+include Makefile
+
+OFLAGS = -Ofast
+
+# there do not seem to be any support for stackexend, so ignore it
+STACKEXTEND =

@@ -34,4 +34,3 @@ $(NO_O3): $(OBJDIR)/%.o: src/Inform6/%.c
 	$(HIDDEN)$(INFO) $(NOLINE) "Compiling $< with $(EXT)..."
 	$(HIDDEN)$(CC) $(subst -O3,-O1295,$(COMPILE_OPTS)) $(COMPILE_TO) "$@" "$<" $(COMPILE_EXTRA)
 	$(TMAKE) tstop_done
-

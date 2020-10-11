@@ -37,7 +37,8 @@ DATE         = /bin/date
 CAT          = cat
 RM           = rm >$(NIL) 2>&1
 EXPR         = expr
-SECONDS      = $(DATE) +%s
+EXPR_TAIL    = || true # because expr returns error codes
+SECONDS      = echo $(NOLINE) `$(DATE) +%s`
 
 # sets NATIVE to 1 when running out of unix context 
 ifeq ($(OS),)
@@ -50,13 +51,14 @@ ifeq ($(NATIVE),1)
 TMP          = t:
 NIL          = nil:
 CAT          = c:type
-RM           = c:delete quiet
+RM           = c:delete quiet >NIL:
 MKDIR        = c:makedir
 TOUCH        = :ade/bin/touch  # FIXME
 DATE         = :ade/bin/date   # FIXME
 TRUE         = :ade/bin/true   # FIXME
 NOLINE       = noline
 EXPR         = c:eval
+EXPR_TAIL    =
 SECONDS      = sys:rexxc/rx "say time(s)"
 endif
 
@@ -94,19 +96,23 @@ LINK_TO      = -o
 
 # Default AMIGA options
 ifeq ($(OS),AmigaOS)
+STACKEXTEND  = -mstackextend
 OS          := aos
-CPU         := 68030
 DEFINES      = -DAMIGA
 OFLAGS      += -m$(CPU) -msoft-float
 LIBS        += -lstack -noixemul
-CFLAGS      += -mstackextend
+CFLAGS      += $(STACKEXTEND)
+endif
+
+ifeq ($(CPU),)
+CPU         := 68030
 endif
 
 # makes compilation less verbose by default
 ifeq ($(VERBOSE),)
 HIDDEN       = @
 INFO         = $(ECHO)
-TMAKE		 = $(HIDDEN)$(MAKE) -s 
+TMAKE		 = $(HIDDEN)$(MAKE) -s
 else
 HIDDEN       =
 INFO         = @$(TRUE)
@@ -128,14 +134,12 @@ unknown: all
 	
 %:
 	$(HIDDEN)$(ECHO) >$(TMP)_  ""
-	$(HIDDEN)$(ECHO) >>$(TMP)_ "FailAt 21"
-	$(HIDDEN)$(ECHO) >>$(TMP)_ "Echo >T:t.c f() {}"
-	$(HIDDEN)$(ECHO) >>$(TMP)_ "sc NOVER >NIL: T:t.c OBJNAME T:t.o"
-	$(HIDDEN)$(ECHO) >>$(TMP)_ "IF *$$RC eq 10"
-	$(HIDDEN)$(ECHO) >>$(TMP)_ "  vbccm68k >NIL:"
-	$(HIDDEN)$(ECHO) >>$(TMP)_ "  IF *$$RC eq 10"
-	$(HIDDEN)$(ECHO) >>$(TMP)_ "    vbccppc >NIL:"
-	$(HIDDEN)$(ECHO) >>$(TMP)_ "    IF *$$RC eq 10"
+	$(HIDDEN)$(ECHO) >>$(TMP)_ "WHICH >NIL: sc"
+	$(HIDDEN)$(ECHO) >>$(TMP)_ "IF WARN"
+	$(HIDDEN)$(ECHO) >>$(TMP)_ "  WHICH >NIL: vbccm68k"
+	$(HIDDEN)$(ECHO) >>$(TMP)_ "  IF WARN"
+	$(HIDDEN)$(ECHO) >>$(TMP)_ "    WHICH >NIL:vbccppc"
+	$(HIDDEN)$(ECHO) >>$(TMP)_ "    IF WARN"
 	$(HIDDEN)$(ECHO) >>$(TMP)_ "      Echo Can't determine compiler"
 	$(HIDDEN)$(ECHO) >>$(TMP)_ "      quit 20"
 	$(HIDDEN)$(ECHO) >>$(TMP)_ "    ELSE"
@@ -147,8 +151,7 @@ unknown: all
 	$(HIDDEN)$(ECHO) >>$(TMP)_ "ELSE"
 	$(HIDDEN)$(ECHO) >>$(TMP)_ "  set MAKEFIlE=Makefile.sasc"
 	$(HIDDEN)$(ECHO) >>$(TMP)_ "ENDIF"
-	$(HIDDEN)$(ECHO) >>$(TMP)_ "DELETE QUIET T:t.o T:t.c"
-	$(HIDDEN)$(ECHO) >>$(TMP)_ "$(MAKE) -f *$$MAKEFILE VERBOSE=$(VERBOSE) $@"
+	$(HIDDEN)$(ECHO) >>$(TMP)_ "$(MAKE) -f *$$MAKEFILE VERBOSE=$(VERBOSE) CPU=$(CPU) $@"
 	$(HIDDEN)$(ECHO) >>$(TMP)_ "quit $$RC"
 	$(HIDDEN)c:execute $(TMP)_
 	$(HIDDEN)$(RM) $(TMP)_
@@ -209,18 +212,6 @@ $(OBJDIR)/%.o: src/Amiga/%.c
 	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) "$@" "$<" 
 	$(TMAKE) tstop_done
 
-.PHONY: tstart
-tstart:
-	$(HIDDEN)$(SECONDS) >$(TMP)_time1
-	
-tstop_%:
-	$(HIDDEN)$(SECONDS) >$(TMP)_time2
-	$(HIDDEN)echo  >>$(TMP)_time2 - 
-	$(HIDDEN)$(CAT) >>$(TMP)_time2 $(TMP)_time1
-	$(HIDDEN)$(EXPR) `$(CAT) $(TMP)_time2` >$(TMP)_time1
-	$(HIDDEN)$(INFO) "done (`$(CAT) $(TMP)_time1` sec)"
-	$(HIDDEN)$(RM) $(TMP)_time1 $(TMP)_time2
-
 ifeq ($(NATIVE),1)
 INC_REVISION = c:eval LFORMAT="%n*n;*n\#define REVISION %n*n" TO $@ \
                1 + `type $@` 
@@ -255,6 +246,20 @@ touch:
 	$(TOUCH) $(OBJDIR)/*.o 
 	-@sleep 1
 	-@c:wait 1
+
+.PHONY: tstart
+TMP_TIME1 = $(TMP).time1-$(EXT)
+TMP_TIME2 = $(TMP).time2-$(EXT)
+tstart:
+	$(HIDDEN)$(SECONDS) >$(TMP_TIME1)
+
+tstop_%:
+	$(HIDDEN)$(SECONDS) >$(TMP_TIME2)
+	$(HIDDEN)echo $(NOLINE) >>$(TMP_TIME2) " - " 
+	$(HIDDEN)$(CAT) >>$(TMP_TIME2) $(TMP_TIME1)
+	$(HIDDEN)$(EXPR) >$(TMP_TIME1) `$(CAT) $(TMP_TIME2)` $(EXPR_TAIL)
+	$(HIDDEN)$(INFO) "done (`$(CAT) $(TMP_TIME1)` sec)"
+	$(HIDDEN)$(RM) $(TMP_TIME1) $(TMP_TIME2)
 
 ###############################################################################
 # cleaning
@@ -295,8 +300,8 @@ else
 		$(subst _, , $(subst -slash-,/,$*)) || (echo && $(CAT) $(TMP)_$* && fail)
 endif
 	$(TMAKE) tstop_ok
-	$(HIDDEN)$(RM) $(TMP)_* *.z5
-	$(HIDDEN)$(POST_TEST)
+	-$(HIDDEN)$(POST_TEST)
+	$(HIDDEN)$(RM) $(TMP)_* *.z5 || true
 	
 ###############################################################################
 # multi-compiler support
@@ -314,7 +319,7 @@ vbcc_%:
 	@echo >> t:_ "$(MAKE) -f Makefile.vbcc-mos $* VERBOSE=$(VERBOSE)"
 	@echo >> t:_ "assign c: vbcc:bin remove"
 	@c:execute t:_
-	@c:delete quiet t:_
+	@c:delete quiet t:_ >NIL:
 
 ade_%:
 	@echo >  t:_ "FailAt 20"
@@ -333,7 +338,7 @@ ade_%:
 	@echo >> t:_ "assign bin:  ade:bin remove"
 	@echo >> t:_ "assign bin:  Applications:gg/bin remove"
 	@c:execute t:_
-	@c:delete quiet t:_
+	@c:delete quiet t:_ >NIL:
 
 gg_%:	
 	@echo >  t:_ "FailAt 20"
@@ -347,14 +352,14 @@ gg_%:
 	@echo >> t:_ "assign devs: gg:sys/devs remove"
 	@echo >> t:_ "assign libs: gg:sys/libs remove"	
 	@c:execute t:_
-	@c:delete quiet t:_
+	@c:delete quiet t:_ >NIL:
 
 sc_%:
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "execute s:_sc >NIL: "
 	@echo >> t:_ "$(MAKE) -f Makefile.sasc $* VERBOSE=$(VERBOSE)"
 	@c:execute t:_
-	@c:delete quiet t:_
+	@c:delete quiet t:_ >NIL:
 
 ###############################################################################
 # archiving
