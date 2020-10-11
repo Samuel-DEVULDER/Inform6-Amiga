@@ -1,4 +1,3 @@
-
 ##############################################################################
 #
 # Generic Makefile for:
@@ -23,7 +22,6 @@ endif
 ifeq ($(origin OS), undefined)
 OS          := $(shell uname)
 endif
-CPU         ?= $(shell uname -m)
 
 TMP          = /tmp/
 NIL          = /dev/null
@@ -98,14 +96,16 @@ LINK_TO      = -o
 ifeq ($(OS),AmigaOS)
 STACKEXTEND  = -mstackextend
 OS          := aos
+CPU         := 68030
 DEFINES      = -DAMIGA
 OFLAGS      += -m$(CPU) -msoft-float
 LIBS        += -lstack -noixemul
 CFLAGS      += $(STACKEXTEND)
 endif
 
+# default cpu target
 ifeq ($(CPU),)
-CPU         := 68030
+CPU         ?= $(shell uname -m)
 endif
 
 # makes compilation less verbose by default
@@ -120,7 +120,11 @@ TMAKE		 = $(INFO)
 endif
 
 # final exe name
-EXE          = $(PROG)-$(OS)-$(CPU)-$(EXT)
+EXE          = $(PROG)-$(OS)-$(CPU)-$(EXT:m68k-amigaos-%=%)
+
+ifeq ($(OS:Windows%=Win)$(EXE:%.exe=%),Win$(EXE))
+EXE         := $(EXE).exe
+endif
 
 # files to arcxhive
 ARCHIVE      = $(PROG)-* Makefile* src Test 
@@ -194,7 +198,9 @@ $(EXE): $(OBJS) $(OBJDIR)/VERstring.o
 	$(HIDDEN)$(INFO) $(NOLINE) "Linking to $@..."
 	$(HIDDEN)$(CC) $(LDFLAGS) $^ $(LINK_TO) $@ $(LIBS) 
 	$(HIDDEN)$(POST_BUILD)
-	$(HIDDEN)$(INFO) done $(SIZE)
+	$(HIDDEN)$(INFO) $(NOLINE) "done ("
+	$(HIDDEN)$(INFO) $(NOLINE) $(SIZE)
+	$(HIDDEN)$(INFO) " bytes)"
 	
 $(OBJS): $(MAKEFILE_LIST)
 
@@ -215,13 +221,13 @@ $(OBJDIR)/%.o: src/Amiga/%.c
 ifeq ($(NATIVE),1)
 INC_REVISION = c:eval LFORMAT="%n*n;*n\#define REVISION %n*n" TO $@ \
                1 + `type $@` 
-SIZE         = "(`c:list LFORMAT=%L $@` bytes)"
+SIZE         = `c:list LFORMAT=%L $@`
 else
 INC_REVISION = 	read n < $@; n=`expr $$n + 1`; \
               	echo > $@ $$n; \
               	echo >> $@ ";"; \
               	echo >>$@ "\#define REVISION $$n"
-SIZE         = "($(shell expr $(shell cat '$@' | wc -c)) bytes)"
+SIZE         = `cat "$@" | wc -c`
 endif
 
 src/Amiga/VER/VERstring.h: $(OBJS)
@@ -258,7 +264,7 @@ tstop_%:
 	$(HIDDEN)echo $(NOLINE) >>$(TMP_TIME2) " - " 
 	$(HIDDEN)$(CAT) >>$(TMP_TIME2) $(TMP_TIME1)
 	$(HIDDEN)$(EXPR) >$(TMP_TIME1) `$(CAT) $(TMP_TIME2)` $(EXPR_TAIL)
-	$(HIDDEN)$(INFO) "done (`$(CAT) $(TMP_TIME1)` sec)"
+	$(HIDDEN)$(INFO) "$* (`$(CAT) $(TMP_TIME1)` sec)"
 	$(HIDDEN)$(RM) $(TMP_TIME1) $(TMP_TIME2)
 
 ###############################################################################
@@ -301,7 +307,7 @@ else
 endif
 	$(TMAKE) tstop_ok
 	-$(HIDDEN)$(POST_TEST)
-	$(HIDDEN)$(RM) $(TMP)_* *.z5 || true
+	$(HIDDEN)$(RM) $(TMP)_* $(whildcards *.z5)
 	
 ###############################################################################
 # multi-compiler support
@@ -314,7 +320,6 @@ endif
 vbcc_%:
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "assign c: vbcc:bin add"
-	@echo >> t:_ "Mount pipe: >NIL:"
 	@echo >> t:_ "$(MAKE) -f Makefile.vbcc-aos $* VERBOSE=$(VERBOSE)"
 	@echo >> t:_ "$(MAKE) -f Makefile.vbcc-mos $* VERBOSE=$(VERBOSE)"
 	@echo >> t:_ "assign c: vbcc:bin remove"
