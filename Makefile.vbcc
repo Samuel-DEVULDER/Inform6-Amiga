@@ -30,7 +30,8 @@ COMPILE_EXTRA = | $(GREP) -v  "warning 120 " | $(GREP) -v  ">{" | $(GREP) -v  ">
 NO_O3 = $(OBJDIR)/expressc.o $(OBJDIR)/files.o
 
 $(NO_O3): $(OBJDIR)/%.o: src/Inform6/%.c
-	$(HIDDEN)$(INFO) $(NOLINE) Compiling $<...
+	$(TMAKE) tstart
+	$(HIDDEN)$(INFO) $(NOLINE) "Compiling $< with $(EXT)..."
 	$(HIDDEN)$(CC) $(subst -O3,-O1295,$(COMPILE_OPTS)) $(COMPILE_TO) "$@" "$<" $(COMPILE_EXTRA)
-	$(HIDDEN)$(INFO) done
+	$(TMAKE) tstop_done
 

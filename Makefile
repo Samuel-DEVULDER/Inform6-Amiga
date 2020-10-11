@@ -36,6 +36,8 @@ TRUE         = true
 DATE         = /bin/date
 CAT          = cat
 RM           = rm >$(NIL) 2>&1
+EXPR         = expr
+SECONDS      = $(DATE) +%s
 
 # sets NATIVE to 1 when running out of unix context 
 ifeq ($(OS),)
@@ -45,6 +47,8 @@ endif
 
 # replace unix commands by amiga (native) ones 
 ifeq ($(NATIVE),1)
+TMP          = t:
+NIL          = nil:
 CAT          = c:type
 RM           = c:delete quiet
 MKDIR        = c:makedir
@@ -52,8 +56,8 @@ TOUCH        = :ade/bin/touch  # FIXME
 DATE         = :ade/bin/date   # FIXME
 TRUE         = :ade/bin/true   # FIXME
 NOLINE       = noline
-TMP          = t:
-NIL          = nil:
+EXPR         = c:eval
+SECONDS      = sys:rexxc/rx "say time(s)"
 endif
 
 # EXT defines the compiler-suffix
@@ -100,11 +104,13 @@ endif
 
 # makes compilation less verbose by default
 ifeq ($(VERBOSE),)
-INFO         = $(ECHO)
 HIDDEN       = @
+INFO         = $(ECHO)
+TMAKE		 = $(HIDDEN)$(MAKE) -s 
 else
-INFO         = @$(TRUE)
 HIDDEN       =
+INFO         = @$(TRUE)
+TMAKE		 = $(INFO)
 endif
 
 # final exe name
@@ -192,14 +198,28 @@ $(OBJS): $(MAKEFILE_LIST)
 COMPILE_OPTS = $(OFLAGS) $(CFLAGS) $(WFLAGS) $(DEFINES:-D%=$(DFLAG)%)
 
 $(OBJDIR)/%.o: src/Inform6/%.c
+	$(TMAKE) tstart
 	$(HIDDEN)$(INFO) $(NOLINE) "Compiling $< with $(EXT)..."
 	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) "$@" "$<" $(COMPILE_EXTRA)
-	$(HIDDEN)$(INFO) done
-
+	$(TMAKE) tstop_done
+	
 $(OBJDIR)/%.o: src/Amiga/%.c
+	$(TMAKE) tstart
 	$(HIDDEN)$(INFO) $(NOLINE) "Compiling $< with $(EXT)..."
 	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) "$@" "$<" 
-	$(HIDDEN)$(INFO) done
+	$(TMAKE) tstop_done
+
+.PHONY: tstart
+tstart:
+	$(HIDDEN)$(SECONDS) >$(TMP)_time1
+	
+tstop_%:
+	$(HIDDEN)$(SECONDS) >$(TMP)_time2
+	$(HIDDEN)echo  >>$(TMP)_time2 - 
+	$(HIDDEN)$(CAT) >>$(TMP)_time2 $(TMP)_time1
+	$(HIDDEN)$(EXPR) `$(CAT) $(TMP)_time2` >$(TMP)_time1
+	$(HIDDEN)$(INFO) "done (`$(CAT) $(TMP)_time1` sec)"
+	$(HIDDEN)$(RM) $(TMP)_time1 $(TMP)_time2
 
 ifeq ($(NATIVE),1)
 INC_REVISION = c:eval LFORMAT="%n*n;*n\#define REVISION %n*n" TO $@ \
@@ -260,7 +280,8 @@ do_tst_all_%:
 		$(subst /,-slash-,$(addprefix do_tst_$*_,$(wildcard test/*.inf)))
 	
 do_tst_%:
-	$(HIDDEN)$(INFO) $(NOLINE) Testing $(subst _, , $(subst -slash-,/,$*))...
+	$(TMAKE) tstart
+	$(HIDDEN)$(INFO) $(NOLINE) Testing $(EXE) $(subst _, , $(subst -slash-,/,$*))...
 ifeq ($(NATIVE),1)
 	$(HIDDEN)echo  >$(TMP)_$*_ "$(EXE) >$(TMP)_$* +test/Library $(TST_$*) $(subst _, , $(subst -slash-,/,$*))"
 	$(HIDDEN)echo >>$(TMP)_$*_ "SET X $$RC"
@@ -273,8 +294,8 @@ else
 	$(HIDDEN)./$(EXE) >$(TMP)_$* +test/Library $(TST_$*) \
 		$(subst _, , $(subst -slash-,/,$*)) || (echo && $(CAT) $(TMP)_$* && fail)
 endif
-	$(HIDDEN)$(INFO) "ok"
-	$(HIDDEN)$(RM)   $(TMP)_*
+	$(TMAKE) tstop_ok
+	$(HIDDEN)$(RM) $(TMP)_* *.z5
 	
 ###############################################################################
 # multi-compiler support
@@ -282,7 +303,7 @@ endif
 
 %_all all_%: sc_% vbcc_% ade_% gg_%
 	@rm t:_ >NIL:
-	@$(INFO) done "$*" wil all compilers...
+	@$(INFO) done "$*" with all compilers...
 
 vbcc_%:
 	@echo >  t:_ "FailAt 20"
@@ -292,7 +313,7 @@ vbcc_%:
 	@echo >> t:_ "$(MAKE) -f Makefile.vbcc-mos $* VERBOSE=$(VERBOSE)"
 	@echo >> t:_ "assign c: vbcc:bin remove"
 	@c:execute t:_
-	@c:delete t:_
+	@c:delete quiet t:_
 
 ade_%:
 	@echo >  t:_ "FailAt 20"
@@ -311,7 +332,7 @@ ade_%:
 	@echo >> t:_ "assign bin:  ade:bin remove"
 	@echo >> t:_ "assign bin:  Applications:gg/bin remove"
 	@c:execute t:_
-	@c:delete t:_
+	@c:delete quiet t:_
 
 gg_%:	
 	@echo >  t:_ "FailAt 20"
@@ -325,14 +346,14 @@ gg_%:
 	@echo >> t:_ "assign devs: gg:sys/devs remove"
 	@echo >> t:_ "assign libs: gg:sys/libs remove"	
 	@c:execute t:_
-	@c:delete t:_
+	@c:delete quiet t:_
 
 sc_%:
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "execute s:_sc >NIL: "
 	@echo >> t:_ "$(MAKE) -f Makefile.sasc $* VERBOSE=$(VERBOSE)"
 	@c:execute t:_
-	@c:delete t:_
+	@c:delete quiet t:_
 
 ###############################################################################
 # archiving
