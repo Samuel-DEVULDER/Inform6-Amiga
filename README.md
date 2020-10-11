@@ -4,8 +4,6 @@ This is a port for Inform6.34 & upward to AmigaOS & friends made by Samuel Devul
 
 The executable(s) contains version string indicating compilation date.
 
-
-
 # Build
 
 Makefile auto-adapts itself to the compiling environment. 
@@ -30,4 +28,4 @@ Source is available on: https://github.com/Samuel-DEVULDER/Inform6-Amiga
 
 # License
 
-The license of the original Inform6 version applies to this port (see [License.txt])
+The license of the original Inform6 version applies to this port (see [License.txt](License.txt))
