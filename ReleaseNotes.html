@@ -6,7 +6,7 @@
 </head>
 <body>
 <h1>Inform Release Notes</h1>
-<h3>Inform Compiler 6.30 to 6.35<br>Inform Library 6/11</h3>
+<h3>Inform Compiler 6.34, 6.33, 6.32, 6.31, 6.30<br>Inform Library 6/11</h3>
 
 <h2>Introduction</h2>
 This is a maintenance release of the Inform system for creating adventure games, intended to address 
@@ -41,50 +41,8 @@ suggestions, providing support and facilities, testing, and so on &mdash; for th
 listed. So instead, this is a general thank-you to everybody who has made this release happen, and 
 specific ones to Graham for permitting it in the first place, and to Andrew for his pioneering work on 
 Glulx.
-
-<h2>Compiler 6.35</h2>
-These are the changes delivered in version 6.35 of the Inform compiler.
-
-<h3>Features added</h3>
-<ul>
-<li><p>Some Unix-style command line options are now supported, primarily to avoid the use of $ in command
-lines (although the old syntax is still supported). The new syntax for these options is:
-<pre>
-  --help
-  --path PATH=dir
-  --addpath PATH=dir
-  --list
-  --size huge, --size large, --size small
-  --helpopt SETTING
-  --opt SETTING=number
-  --config filename
-</pre>
-</ul>
-
-<h3>Bugs fixed</h3>
-<ul>
-<li><p>Only the following directives are now allowed in a function or object definition: all others give
-an error:
-<pre>
-  #ifv3
-  #ifv5
-  #ifdef
-  #ifndef
-  #iftrue
-  #iffalse
-  #ifnot
-  #endif
-  #message
-  #origsource
-  #trace
-</pre>
-<li><p>An <tt>#ifdef</tt> statement at the start of a <tt>switch</tt> block now compiles correctly, and no
-longer gives a spurious error.
-<li><p>If a common property array overflows when compiling to Z-code version 3, the object is no longer
-corrupted.
-<li><p>When compiling to Z-code version 3, dictionary words are now correctly truncated at 6 z-characters
-(instead of 9).
-</ul>
+There are, naturally, sure to be imperfections in the release, and these should be reported through the
+<a href="http://inform7.com/mantis/">Inform bug tracker</a>.
 
 <h2>Compiler 6.34</h2>
 These are the changes delivered in version 6.34 of the Inform compiler.
@@ -118,12 +76,6 @@ e.g.
 <li><p>It has always been possible to replace the paths used by the compiler with a command line option of the
 form <tt>+include_path=foo</tt>. It is now possible to add to an existing path without replacing it by using
 an additional '+' character, like so: <tt>++include_path=foo</tt>.
-<li><p>The <tt>Replace</tt> directive can now be applied to routines in any file, whether it has the <tt>System_file</tt> directive or not. <tt>Replace</tt> also now works on recursive functions, which it previously did not. Its behavior can now be described this way:
-<pre>
-  Replace Func;
-  Replace Func OriginalFunc;
-</pre>
-Multiple definitions of <tt>Func()</tt> may follow this directive. <tt>Func</tt> will refer to the last-defined version, except that definitions in normal files are preferred over definitions in <tt>System_file</tt> files or the veneer. With the two-symbol form (introduced in 6.33), the latter symbol will refer to the <em>first</em>-defined version of the function.
 <li><p>A new <tt>Origsource</tt> directive has been added to allow a record of the location of the relevant in
 a higher-level language that has been converted to Inform 6. (In practice, this will very likely be the location in
 an Inform 7 source.) The syntax is
@@ -182,7 +134,7 @@ very long verbs would crash the compiler. [Mantis 2023]
 <li><p>Compiling to Z-code version 3 has shown a number of regressions since Inform 6.15:
  <ul>
  <li>Diverted actions, of the form <tt>&lt;&lt;ACTION&gt;&gt;</tt>, are fixed.
- <li>The veneer routine <tt>RA__Pr()</tt> can be used.
+ <li>The veneer routine <tt>RA__Ptr</tt> can be used.
  </ul>
 </ul>
 

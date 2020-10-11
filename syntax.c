@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------- */
 /*   "syntax" : Syntax analyser and compiler                                 */
 /*                                                                           */
-/*   Part of Inform 6.35                                                     */
+/*   Part of Inform 6.34                                                     */
 /*   copyright (c) Graham Nelson 1993 - 2020                                 */
 /*                                                                           */
 /* ------------------------------------------------------------------------- */
@@ -71,7 +71,13 @@ extern void get_next_token_with_directives(void)
 
        This is called while parsing a long construct, such as Class or
        Object, where we want to support internal #ifdefs. (Although
-       function-parsing predates this and doesn't make use of it.) */
+       function-parsing predates this and doesn't make use of it.)
+
+       (Technically this permits *any* #-directive, which means you
+       can define global variables or properties or what-have-you in
+       the middle of an object. You can do that in the middle of an
+       object, too. Don't. It's about as well-supported as Wile E.
+       Coyote one beat before the plummet-lines kick in.) */
 
     int directives_save, segment_markers_save, statements_save;
 
@@ -136,8 +142,6 @@ extern int parse_directive(int internal_flag)
     /*  Internal_flag is FALSE if the directive is encountered normally,
         TRUE if encountered with a # prefix inside a routine or object
         definition.
-
-        (Only directives like #ifdef are permitted inside a definition.)
 
         Returns: TRUE if program continues, FALSE if end of file reached.    */
 
@@ -596,11 +600,6 @@ extern void parse_code_block(int break_label, int continue_label,
     {   do
         {   begin_syntax_line(TRUE);
             get_next_token();
-            
-            if ((token_type == SEP_TT) && (token_value == HASH_SEP))
-            {   parse_directive(TRUE);
-                continue;
-            }
             if (token_type == SEP_TT && token_value == CLOSE_BRACE_SEP)
             {   if (switch_clause_made && (!default_clause_made))
                     assemble_label_no(switch_label);
