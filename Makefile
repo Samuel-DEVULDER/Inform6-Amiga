@@ -296,6 +296,7 @@ else
 endif
 	$(TMAKE) tstop_ok
 	$(HIDDEN)$(RM) $(TMP)_* *.z5
+	$(HIDDEN)$(POST_TEST)
 	
 ###############################################################################
 # multi-compiler support

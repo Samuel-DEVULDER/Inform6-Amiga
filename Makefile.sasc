@@ -23,3 +23,4 @@ LDFLAGS      = NOVER NOICONS
 LIBS         = MATH=S STKEXT
 
 POST_BUILD   = c:delete quiet \#?.lnk 
+POST_TEST    = c:delete quiet t:\#?.\#[0-9]?
