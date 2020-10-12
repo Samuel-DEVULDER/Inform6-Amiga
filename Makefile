@@ -320,7 +320,7 @@ endif
 vbcc_%:
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "assign c: vbcc:bin add"
-	@echo >> t:_ "$(MAKE) -f Makefile.vbcc-aos $* VERBOSE=$(VERBOSE)"
+	@echo >> t:_ "$(MAKE) -f Makefile.vbcc-aos $* VERBOSE=$(VERBOSE) CPU=$(CPU)"
 	@echo >> t:_ "$(MAKE) -f Makefile.vbcc-mos $* VERBOSE=$(VERBOSE)"
 	@echo >> t:_ "assign c: vbcc:bin remove"
 	@c:execute t:_
@@ -331,7 +331,7 @@ ade_%:
 	@echo >> t:_ "assign IXPIPE: dismount >NIL: "
 	@echo >> t:_ "assign PIPE:   dismount >NIL: "
 	@echo >> t:_ "execute s:_ade >NIL: "
-	@echo >> t:_ "$(MAKE) -f Makefile.295 $* VERBOSE=$(VERBOSE)"
+	@echo >> t:_ "$(MAKE) -f Makefile.295 $* VERBOSE=$(VERBOSE) CPU=$(CPU)"
 	@echo >> t:_ "assign c:    ade:bin remove"
 	@echo >> t:_ "assign c:    ade:sys/c remove"
 	@echo >> t:_ "assign l:    ade:sys/l remove"
@@ -351,7 +351,7 @@ gg_%:
 	@echo >> t:_ "assign IXPIPE: dismount >NIL: "
 	@echo >> t:_ "assign PIPE:   dismount >NIL: "
 	@echo >> t:_ "execute s:_gg >NIL: "
-	@echo >> t:_ "$(MAKE) -f Makefile.322 $* VERBOSE=$(VERBOSE)"
+	@echo >> t:_ "$(MAKE) -f Makefile.322 $* VERBOSE=$(VERBOSE) CPU=$(CPU)"
 	@echo >> t:_ "assign c:    gg:bin remove"
 	@echo >> t:_ "assign l:    gg:sys/l remove"
 	@echo >> t:_ "assign devs: gg:sys/devs remove"
@@ -362,7 +362,7 @@ gg_%:
 sc_%:
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "execute s:_sc >NIL: "
-	@echo >> t:_ "$(MAKE) -f Makefile.sasc $* VERBOSE=$(VERBOSE)"
+	@echo >> t:_ "$(MAKE) -f Makefile.sasc $* VERBOSE=$(VERBOSE) CPU=$(CPU)"
 	@c:execute t:_
 	@c:delete quiet t:_ >NIL:
 
