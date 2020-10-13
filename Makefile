@@ -128,8 +128,9 @@ ifeq ($(OS:Windows%=Win)$(EXE:%.exe=%),Win$(EXE))
 EXE         := $(EXE).exe
 endif
 
-# files to arcxhive
-ARCHIVE      = $(PROG)-* Makefile* src Test 
+# files to archive
+DISTRIB      = $(PROG)-* README.* License.*
+ARCHIVE      = $(DISTRIB) Makefile* src Test 
 
 ###############################################################################
 # top-level targets
@@ -248,7 +249,7 @@ src/Amiga/VER/VERstring.h: $(OBJS)
 
 $(OBJDIR)/VERstring.o: src/Amiga/VER/VERstring.c src/Amiga/VER/VERstring.h
 	$(HIDDEN)$(CC) $(CFLAGS) $(COMPILE_TO) $@ $< \
-		$(DFLAG)DATESTR=`$(DATE) +\"%-d.%-m.%y\"` $(DFLAG)PROGNAME=$(EXE)
+		$(DFLAG)DATESTR=`$(DATE) +\"%-d.%-m.1%y\"` $(DFLAG)PROGNAME=$(EXE)
 	
 ###############################################################################
 # helpers
@@ -390,7 +391,8 @@ sc_%:
 ###############################################################################
 
 zip: 
-	zip -ru "$(PROG).zip" $(ARCHIVE)
+	rm "$(PROG).zip"
+	zip -ru "$(PROG).zip" $(DISTRIB) -x $(wildcard *sasc*)
 
 lha: 
 	lha -r u "$(PROG).lha" $(ARCHIVE)

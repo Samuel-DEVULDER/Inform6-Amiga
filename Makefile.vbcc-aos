@@ -2,7 +2,11 @@
 # Makefile for vbcc targetting 68k AmigaOS
 ##############################################################################
 
+ifneq ("$(wildcard vbcc:config/kick13)","")
+CC     := vc +kick13
+else
 CC     := vc +aos68k
+endif
 
 ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.vbcc-aos)
 MAKEFILE_LIST += Makefile.vbcc-aos

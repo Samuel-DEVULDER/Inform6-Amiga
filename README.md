@@ -1,8 +1,15 @@
 # Inform6
 
-This is a port for Inform6.34 & upward to AmigaOS & friends made by [Samuel Devulder](https://github.com/Samuel-DEVULDER). 
+This is a port for [Inform6.34](https://github.com/DavidKinder/Inform6/releases/tag/v6.34) & [upward](https://github.com/DavidKinder/Inform6/) to AmigaOS & friends made by [Samuel Devulder](https://github.com/Samuel-DEVULDER). 
 
-The executable(s) contains version string indicating compilation date.
+# Binaries
+
+Binaries for various compilers are available [here]().
+
+The executable(s) contains version string indicating compilation date as well as Inform6 version.
+```
+
+```
 
 # Build
 
