@@ -65,19 +65,11 @@ ifeq ($(origin EXT), undefined) # for some reason ?= doesn't work here
 EXT         := $(notdir $(CC))-$(shell $(CC) -dumpversion)
 endif
 
-# compiler-dependant object directory
-ifeq ($(origin OBJDIR), undefined) # for some reason ?= doesn't work here
-OBJDIR      := objs-$(EXT)
-endif
-
 # test-cases files
 INF          = $(wildcard test/*.inf)
 
 # source files
 SRC          = $(wildcard src/Inform6/*.c src/amiga/*.c)
-
-# object files
-OBJS         = $(addprefix $(OBJDIR)/,$(notdir $(SRC:%.c=%.o)))
 
 # various GCC flags
 WFLAGS       =
@@ -94,9 +86,11 @@ LINK_TO      = -o
 
 # Default AMIGA options
 ifeq ($(OS),AmigaOS)
-STACKEXTEND  = -mstackextend
 OS          := aos
+ifeq ($(CPU),)
 CPU         := 68030
+endif
+STACKEXTEND  = -mstackextend
 DEFINES      = -DAMIGA
 OFLAGS      += -m$(CPU) -msoft-float
 LIBS        += -lstack -noixemul
@@ -107,6 +101,14 @@ endif
 ifeq ($(CPU),)
 CPU         ?= $(shell uname -m)
 endif
+
+# compiler-dependant object directory
+ifeq ($(origin OBJDIR), undefined) # for some reason ?= doesn't work here
+OBJDIR      := o-$(EXT)-$(CPU:680%0=%)
+endif
+
+# object files
+OBJS         = $(addprefix $(OBJDIR)/,$(notdir $(SRC:%.c=%.o)))
 
 # makes compilation less verbose by default
 ifeq ($(VERBOSE),)
@@ -181,6 +183,16 @@ git-subtree: /bin/git-subtree
 	wget rawgit.com/git/git/master/contrib/subtree/git-subtree.sh
 	install git-subtree.sh /bin/git-subtree
 	rm git-subtree.sh
+
+git-tag-%:
+	git commit
+	git tag "$*" HEAD
+	git push origin --tags
+	
+git-untag-%:
+	git tag --delete "$*"
+	git push origin --delete "$*"
+	
 	
 ###############################################################################
 # compilation
@@ -197,10 +209,9 @@ $(OBJDIR):
 $(EXE): $(OBJS) $(OBJDIR)/VERstring.o
 	$(HIDDEN)$(INFO) $(NOLINE) "Linking to $@..."
 	$(HIDDEN)$(CC) $(LDFLAGS) $^ $(LINK_TO) $@ $(LIBS) 
-	$(HIDDEN)$(POST_BUILD)
 	$(HIDDEN)$(INFO) $(NOLINE) "done ("
-	$(HIDDEN)$(INFO) $(NOLINE) $(SIZE)
-	$(HIDDEN)$(INFO) " bytes)"
+	$(HIDDEN)$(INFO) $(SIZE) " bytes)"
+	$(HIDDEN)$(POST_BUILD)
 	
 $(OBJS): $(MAKEFILE_LIST)
 
@@ -289,7 +300,7 @@ do_tst_fill:
 do_tst_all_%:
 	@$(MAKE) -s EXE=$(EXE) HIDDEN=$(HIDDEN) TMP=$(TMP) \
 		$(subst /,-slash-,$(addprefix do_tst_$*_,$(wildcard test/*.inf)))
-	
+
 do_tst_%:
 	$(TMAKE) tstart
 	$(HIDDEN)$(INFO) $(NOLINE) Testing $(EXE) $(subst _, , $(subst -slash-,/,$*))...
@@ -307,7 +318,7 @@ else
 endif
 	$(TMAKE) tstop_ok
 	-$(HIDDEN)$(POST_TEST)
-	$(HIDDEN)$(RM) $(TMP)_* $(whildcards *.z5)
+	$(HIDDEN)$(RM) $(TMP)_* $(subst -h,,$(*:-v5_test-slash-%.inf=%.z5))
 	
 ###############################################################################
 # multi-compiler support
@@ -316,8 +327,16 @@ endif
 %_all all_%: sc_% vbcc_% ade_% gg_%
 	@rm t:_ >NIL:
 	@$(INFO) done "$*" with all compilers...
+	
+all_cpus_%: 
+	$(MAKE) all_$* CPU=68000 VERBOSE=$(VERBOSE)
+	$(MAKE) all_$* CPU=68020 VERBOSE=$(VERBOSE)
+	$(MAKE) all_$* CPU=68030 VERBOSE=$(VERBOSE)
+	$(MAKE) all_$* CPU=68040 VERBOSE=$(VERBOSE)
+	$(MAKE) all_$* CPU=68060 VERBOSE=$(VERBOSE)
 
 vbcc_%:
+	-@Mount PIPE:
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "assign c: vbcc:bin add"
 	@echo >> t:_ "$(MAKE) -f Makefile.vbcc-aos $* VERBOSE=$(VERBOSE) CPU=$(CPU)"

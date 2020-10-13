@@ -5,10 +5,7 @@
 CC     := vc +morphos
 OS     := morphos
 CPU    := ppc
-OBJDIR := obj$(CPU)
 NATIVE := 1
-
-EXT    := vbccppc
 
 ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.vbcc-mos)
 MAKEFILE_LIST += Makefile.vbcc-mos

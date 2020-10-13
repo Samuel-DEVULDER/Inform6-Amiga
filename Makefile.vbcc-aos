@@ -3,9 +3,6 @@
 ##############################################################################
 
 CC     := vc +aos68k
-OBJDIR := obj68k
-
-EXT    := vbccm68k
 
 ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.vbcc-aos)
 MAKEFILE_LIST += Makefile.vbcc-aos

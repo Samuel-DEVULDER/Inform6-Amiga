@@ -46,5 +46,27 @@ int putchar(int c) {
 	return putc(c, stdout);
 }
 
+#if defined(__GNUC__) && defined(mc68000) && !defined(mc68020)  && !defined(mc68030)  && !defined(mc68040)  && !defined(mc68060) 
+#include <math.h>
+double frexp(double x,int * nptr)
+{
+        int e = 0;
+        int s = 1;
+
+        if(x < 0) x = -x, s = -s;
+
+		while(x >= 1) {++e; x /= 2;}
+        while (0 < x && x < 0.5) {--e; x *= 2;}
+        
+		*nptr = e;
+		return x * s;
+
+}
+double ldexp(double x, int exp)
+{
+        return x*pow(2.0,exp);
+}
+#endif
+
 #endif /* __SASC */
 
