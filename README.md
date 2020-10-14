@@ -6,9 +6,11 @@ This is a port for [Inform6.34](https://github.com/DavidKinder/Inform6/releases/
 
 Binaries for various compilers are available [here]().
 
-The executable(s) contains version string indicating compilation date as well as Inform6 version.
+The executable(s) contains version string indicating compilation date as well as Inform6 version. This way you know exactly which version you are using:
 ```
-
+Applications:Inform6> version Inform6-aos-68000-vbcc  full
+Inform6-aos-68000-vbcc 1634.529 (14/10/20)
+Build #529 Compiled by Samuel DEVULDER
 ```
 
 # Build

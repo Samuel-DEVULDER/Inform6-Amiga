@@ -166,6 +166,9 @@ else
 all: compile
 
 tst: compile do_tst_fill do_tst_-h do_tst_all_-v5
+ifeq ($(NATIVE),1)
+	c:version $(EXE) full
+endif
 
 endif
 
@@ -211,7 +214,7 @@ $(EXE): $(OBJS) $(OBJDIR)/VERstring.o
 	$(HIDDEN)$(INFO) $(NOLINE) "Linking to $@..."
 	$(HIDDEN)$(CC) $(LDFLAGS) $^ $(LINK_TO) $@ $(LIBS) 
 	$(HIDDEN)$(INFO) $(NOLINE) "done ("
-	$(HIDDEN)$(INFO) $(SIZE) " bytes)"
+	$(HIDDEN)$(INFO) $(SIZE) "bytes)"
 	$(HIDDEN)$(POST_BUILD)
 	
 $(OBJS): $(MAKEFILE_LIST)
@@ -249,7 +252,7 @@ src/Amiga/VER/VERstring.h: $(OBJS)
 
 $(OBJDIR)/VERstring.o: src/Amiga/VER/VERstring.c src/Amiga/VER/VERstring.h
 	$(HIDDEN)$(CC) $(CFLAGS) $(COMPILE_TO) $@ $< \
-		$(DFLAG)DATESTR=`$(DATE) +\"%-d.%-m.1%y\"` $(DFLAG)PROGNAME=$(EXE)
+		$(DFLAG)DATESTR=`$(DATE) +\"%-d.%-m.1%y\"` $(DFLAG)CPU=$(CPU) "$(DFLAG)COMPILER=$(EXT)"
 	
 ###############################################################################
 # helpers
@@ -284,10 +287,10 @@ tstop_%:
 ###############################################################################
 
 clean:
-	-$(RM) $(OBJDIR)/*.o *.z5
+	-$(RM) $(EXE) $(OBJDIR)/*.o
 
 fullclean: clean
-	-$(RM) $(EXE) -r $(OBJDIR)
+	-$(RM) -r $(OBJDIR)
 
 ###############################################################################
 # perform tests
