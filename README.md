@@ -11,7 +11,6 @@ The executable(s) contains version string indicating compilation date as well as
 Applications:Inform6> version Inform6-vbcc-ppc.mos  full
 Inform 6.34 of 21st May 2020 (15/10/20)
 Build #685 (Oct 15 2020) for mos/ppc by Samuel DEVULDER with vbcc
-
 ```
 __Notice__: *ks13 = AmigaOS 1.3, aos = AmigaOS 2+, mos = MorphOS*
 
