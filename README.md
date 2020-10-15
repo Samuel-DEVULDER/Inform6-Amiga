@@ -4,14 +4,16 @@ This is a port for [Inform6.34](https://github.com/DavidKinder/Inform6/releases/
 
 # Binaries
 
-Binaries for various compilers are available [here]().
+Binaries for various compilers, processor, and OSes are available [here]().	
 
 The executable(s) contains version string indicating compilation date as well as Inform6 version. This way you know exactly which version you are using:
 ```
-Applications:Inform6> version Inform6-aos-68000-vbcc  full
-Inform6-aos-68000-vbcc 1634.529 (14/10/20)
-Build #529 Compiled by Samuel DEVULDER
+Applications:Inform6> version Inform6-vbcc-ppc.mos  full
+Inform 6.34 of 21st May 2020 (15/10/20)
+Build #685 (Oct 15 2020) for mos/ppc by Samuel DEVULDER with vbcc
+
 ```
+__Notice__: *ks13 = AmigaOS 1.3, aos = AmigaOS 2+, mos = MorphOS*
 
 # Build
 
