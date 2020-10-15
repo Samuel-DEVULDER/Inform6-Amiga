@@ -2,8 +2,9 @@
 # Makefile for SAS/C
 ###############################################################################
 
-CC  := sc
-EXT := sasc
+CC          := sc
+EXT         := sasc
+LDOBJS       = $(OBJDIR)/\#?
 
 ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.sasc)
 MAKEFILE_LIST += Makefile.sasc

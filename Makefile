@@ -84,7 +84,7 @@ LIBS         = -lm
 COMPILE_TO   = -c -o
 LINK_TO      = -o
 
-# Default AMIGA options
+# Default AMIGA-GCC options
 ifeq ($(OS),AmigaOS)
 OS          := aos
 ifeq ($(CPU),)
@@ -104,7 +104,7 @@ endif
 
 # compiler-dependant object directory
 ifeq ($(origin OBJDIR), undefined) # for some reason ?= doesn't work here
-OBJDIR      := o-$(EXT)-$(CPU:680%0=%)
+OBJDIR      := objs-$(EXT)-$(CPU:68%=%)
 endif
 
 # object files
@@ -122,7 +122,7 @@ TMAKE		 = $(INFO)
 endif
 
 # final exe name
-EXE          = $(PROG)-$(OS)-$(CPU)-$(EXT:m68k-amigaos-%=%)
+EXE          = $(PROG)-$(EXT:m68k-amigaos-%=%)-$(CPU).$(OS)
 
 ifeq ($(OS:Windows%=Win)$(EXE:%.exe=%),Win$(EXE))
 EXE         := $(EXE).exe
@@ -165,10 +165,7 @@ unknown: all
 else
 all: compile
 
-tst: compile do_tst_fill do_tst_-h do_tst_all_-v5
-ifeq ($(NATIVE),1)
-	c:version $(EXE) full
-endif
+tst: compile do_tst_fill do_tst_version do_tst_-h do_tst_all_-v5
 
 endif
 
@@ -202,17 +199,18 @@ git-untag-%:
 # compilation
 ###############################################################################
 
-dump_%:
-	echo $*=$($*)
-
 compile: $(OBJDIR) $(EXE) 
 
 $(OBJDIR):
 	-$(MKDIR) $(OBJDIR)
-
+	
 $(EXE): $(OBJS) $(OBJDIR)/VERstring.o
 	$(HIDDEN)$(INFO) $(NOLINE) "Linking to $@..."
+ifneq ($(LDOBJS),)
+	$(HIDDEN)$(CC) $(LDFLAGS) $(LDOBJS) $(LINK_TO) $@ $(LIBS) 
+else
 	$(HIDDEN)$(CC) $(LDFLAGS) $^ $(LINK_TO) $@ $(LIBS) 
+endif
 	$(HIDDEN)$(INFO) $(NOLINE) "done ("
 	$(HIDDEN)$(INFO) $(SIZE) "bytes)"
 	$(HIDDEN)$(POST_BUILD)
@@ -252,11 +250,16 @@ src/Amiga/VER/VERstring.h: $(OBJS)
 
 $(OBJDIR)/VERstring.o: src/Amiga/VER/VERstring.c src/Amiga/VER/VERstring.h
 	$(HIDDEN)$(CC) $(CFLAGS) $(COMPILE_TO) $@ $< \
-		$(DFLAG)DATESTR=`$(DATE) +\"%-d.%-m.1%y\"` $(DFLAG)CPU=$(CPU) "$(DFLAG)COMPILER=$(EXT)"
+		$(DFLAG)DATESTR=`$(DATE) +\"%-d.%-m.1%y\"` \
+		$(DFLAG)CPU=$(OS)/$(CPU) \
+		"$(DFLAG)COMPILER=$(EXT:m68k-amigaos-%=%)"
 	
 ###############################################################################
 # helpers
 ###############################################################################
+
+echo_%:
+	@echo $*=$($*)
 
 relink: touch compile
 
@@ -323,6 +326,15 @@ endif
 	$(TMAKE) tstop_ok
 	-$(HIDDEN)$(POST_TEST)
 	$(HIDDEN)$(RM) $(TMP)_* $(subst -h,,$(*:-v5_test-slash-%.inf=%.z5))
+
+do_tst_version: compile
+	$(HIDDEN)$(INFO) $(NOLINE) Testing version...
+ifeq ($(NATIVE),1)
+	$(HIDDEN)c:version $(EXE) full
+else 
+# emulate
+	$(HIDDEN)strings "$(EXE)" | grep '$VER: ' | sed -e 's%[)] %)\n%'
+endif
 	
 ###############################################################################
 # multi-compiler support

@@ -103,4 +103,5 @@ static int dummy=
 #define R2 "9"
 #endif
 
-char *VERstring = "\0$VER: Inform " R0 "." R1 R2 " of " RELEASE_DATE " (" DATESTR ") Build #" STR(REVISION) " for " STR(CPU) " by Samuel DEVULDER on " __DATE__ " with " STR(COMPILER) "\0";
+char *VERstring = "\0$VER: Inform " R0 "." R1 R2 " of " RELEASE_DATE " (" DATESTR ") " \
+"Build #" STR(REVISION) " (" __DATE__ ") for " STR(CPU) " by Samuel DEVULDER with " STR(COMPILER) "\0";

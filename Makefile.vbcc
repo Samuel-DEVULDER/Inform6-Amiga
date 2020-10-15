@@ -15,6 +15,7 @@ MAKEFILE_LIST += Makefile.vbcc
 endif
 
 EXT    := vbcc
+LDOBJS  = $(OBJDIR)/\#?
 
 include Makefile
 
