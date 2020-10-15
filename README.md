@@ -19,7 +19,7 @@ __Notice__: *ks13 = AmigaOS 1.3, aos = AmigaOS 2+, mos = MorphOS*
 
 Makefile auto-adapts itself to the compiling environment. 
 
-Just get a gnu-c compatible make (the one of 1995-12-16 from Aaron Digulla on [Aminet](http://aminet.net/package/dev/c/make-3.75-bin) seem to work ok) and type `make` in a Shell and let the executable being compiled.
+Just get a gnu-c compatible make (the one of 1995-12-16 from [Aaron Digulla on Aminet](http://aminet.net/package/dev/c/make-3.75-bin) seem to work ok) and type `make` in a Shell and let the executable being compiled.
 
 Example:
 ```
