@@ -3,11 +3,11 @@
 ##############################################################################
 
 ifneq ("$(wildcard vbcc:config/kick13)","")
-CC     := vc +kick13
-OS     := ks13
-NATIVE := 1
+CC          := vc +kick13
+OS          := ks13
+RUNNING_AOS := 1
 else
-CC     := vc +aos68k
+CC          := vc +aos68k
 endif
 
 ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.vbcc-aos)

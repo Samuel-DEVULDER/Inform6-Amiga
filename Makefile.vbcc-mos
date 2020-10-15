@@ -2,10 +2,10 @@
 # Makefile for vbcc targetting ppc MorphOS
 ##############################################################################
 
-CC     := vc +morphos
-OS     := mos
-CPU    := ppc
-NATIVE := 1
+CC          := vc +morphos
+CPU         := ppc
+OS          := mos
+RUNNING_AOS := 1
 
 ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.vbcc-mos)
 MAKEFILE_LIST += Makefile.vbcc-mos

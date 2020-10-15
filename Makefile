@@ -38,14 +38,14 @@ EXPR         = expr
 EXPR_TAIL    = || true # because expr returns error codes
 SECONDS      = echo $(NOLINE) `$(DATE) +%s`
 
-# sets NATIVE to 1 when running out of unix context 
+# sets RUNNING_AOS to 1 when running out of unix context 
 ifeq ($(OS),)
-NATIVE       = 1
+RUNNING_AOS  = 1
 OS          := AmigaOS
 endif
 
 # replace unix commands by amiga (native) ones 
-ifeq ($(NATIVE),1)
+ifeq ($(RUNNING_AOS),1)
 TMP          = t:
 NIL          = nil:
 CAT          = c:type
@@ -84,7 +84,7 @@ LIBS         = -lm
 COMPILE_TO   = -c -o
 LINK_TO      = -o
 
-# Default AMIGA-GCC options
+# Default AMIGA options (mainly for GCC)
 ifeq ($(OS),AmigaOS)
 OS          := aos
 ifeq ($(CPU),)
@@ -136,7 +136,7 @@ ARCHIVE      = $(DISTRIB) Makefile* src Test
 # top-level targets
 ###############################################################################
 
-ifeq ($(NATIVE)$(firstword $(MAKEFILE_LIST)),1Makefile)
+ifeq ($(RUNNING_AOS)$(firstword $(MAKEFILE_LIST)),1Makefile)
 unknown: all
 	
 %:
@@ -231,7 +231,7 @@ $(OBJDIR)/%.o: src/Amiga/%.c
 	$(HIDDEN)$(CC) $(COMPILE_OPTS) $(COMPILE_TO) "$@" "$<" 
 	$(TMAKE) tstop_done
 
-ifeq ($(NATIVE),1)
+ifeq ($(RUNNING_AOS),1)
 INC_REVISION = c:eval LFORMAT="%n*n;*n\#define REVISION %n*n" TO $@ \
                1 + `type $@` 
 SIZE         = `c:list LFORMAT=%L $@`
@@ -311,7 +311,7 @@ do_tst_all_%:
 do_tst_%:
 	$(TMAKE) tstart
 	$(HIDDEN)$(INFO) $(NOLINE) Testing $(EXE) $(subst _, , $(subst -slash-,/,$*))...
-ifeq ($(NATIVE),1)
+ifeq ($(RUNNING_AOS),1)
 	$(HIDDEN)echo  >$(TMP)_$*_ "$(EXE) >$(TMP)_$* +test/Library $(TST_$*) $(subst _, , $(subst -slash-,/,$*))"
 	$(HIDDEN)echo >>$(TMP)_$*_ "SET X $$RC"
 	$(HIDDEN)echo >>$(TMP)_$*_ "IF NOT $$X EQ 0"
@@ -329,7 +329,7 @@ endif
 
 do_tst_version: compile
 	$(HIDDEN)$(INFO) $(NOLINE) Testing version...
-ifeq ($(NATIVE),1)
+ifneq ($(EXE:%.exe=1),1)
 	$(HIDDEN)c:version $(EXE) full
 else 
 # emulate
