@@ -404,6 +404,7 @@ git-subtree: /bin/git-subtree
 
 git-tag-%:
 	git commit
+	git push
 	git tag "$*" HEAD
 	git push origin --tags
 	
