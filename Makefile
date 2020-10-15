@@ -168,32 +168,6 @@ all: compile
 tst: compile do_tst_fill do_tst_version do_tst_-h do_tst_all_-v5
 
 endif
-
-###############################################################################
-# git-suff
-###############################################################################
-
-git-pull: git-subtree
-	git pull
-	git subtree pull --prefix test/Library https://gitlab.com/DavidGriffith/inform6lib.git master --squash
-	git subtree pull --prefix src/Inform6 https://github.com/DavidKinder/Inform6.git master --squash
-
-git-subtree: /bin/git-subtree
-
-/bin/git-subtree:
-	wget rawgit.com/git/git/master/contrib/subtree/git-subtree.sh
-	install git-subtree.sh /bin/git-subtree
-	rm git-subtree.sh
-
-git-tag-%:
-	git commit
-	git tag "$*" HEAD
-	git push origin --tags
-	
-git-untag-%:
-	git tag --delete "$*"
-	git push origin --delete "$*"
-	
 	
 ###############################################################################
 # compilation
@@ -411,5 +385,30 @@ zip:
 
 lha: 
 	lha -r u "$(PROG).lha" $(ARCHIVE)
+	
+###############################################################################
+# git-suff
+###############################################################################
+
+git-pull: git-subtree
+	git pull
+	git subtree pull --prefix test/Library https://gitlab.com/DavidGriffith/inform6lib.git master --squash
+	git subtree pull --prefix src/Inform6 https://github.com/DavidKinder/Inform6.git master --squash
+
+git-subtree: /bin/git-subtree
+
+/bin/git-subtree:
+	wget rawgit.com/git/git/master/contrib/subtree/git-subtree.sh
+	install git-subtree.sh /bin/git-subtree
+	rm git-subtree.sh
+
+git-tag-%:
+	git commit
+	git tag "$*" HEAD
+	git push origin --tags
+	
+git-untag-%:
+	git tag --delete "$*"
+	git push origin --delete "$*"
 	
 # end-of-file
