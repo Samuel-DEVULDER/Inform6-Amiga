@@ -8,9 +8,13 @@ Binaries for various compilers, processor, and OSes are available [here](https:/
 
 The executable(s) contains version string indicating compilation date as well as Inform6 version. This way you know exactly which version you are using:
 ```
-Applications:Inform6> version Inform6-vbcc-ppc.mos  full
-Inform 6.34 of 21st May 2020 (15/10/20)
-Build #685 (Oct 15 2020) for mos/ppc by Samuel DEVULDER with vbcc
+Applications:Inform6.34> version Inform6-vbcc-ppc.morphos full
+Inform 6.34 of 21st May 2020 (17/10/20)
+Build #862 (Oct 17 2020) for morphos/ppc by Samuel DEVULDER with vbcc
+
+Applications:Inform6.34> version Inform6-gcc-2.95.3-68000.ks13  full
+Inform 6.34 of 21st May 2020 (17/10/20)
+Build #855 (Oct 17 2020) for ks13/68000 by Samuel DEVULDER with gcc-2.95.3
 ```
 __Notice__: *ks13 = AmigaOS 1.3+, ks2x = AmigaOS 2.0+*
 
@@ -147,7 +151,7 @@ Testing Inform6-aos-68000-vbccm68k -v5 test/toyshop.inf...done (1 sec)
 Applications:Inform6> 
 ```
 
-Stack auto-extension is enabled when possible since unix-like programs usually require a larger stack size than Amiga usually provides.
+Stack auto-extension is enabled when possible since unix-like programs usually require a larger stack size than Amiga usually provides. VBCC versions (both 68k & ppc) doesn't have this feature, so they'll just check for stack overflow and display an error message the stack was smaller than needed (32kb seem to be a bare minimum).
 
 **Notice related to compiling with VBCC**: 
 * the PIPE: device must be mounted in order to ignore _warning 120_ which can not be filtered out otherwise.
