@@ -294,7 +294,7 @@ ifeq ($(RUNNING_AOS),1)
 	$(HIDDEN)echo >>$(TMP)_$*_ "SET X *$$RC"
 	$(HIDDEN)echo >>$(TMP)_$*_ "IF NOT *$$X EQ 0"
 	$(HIDDEN)echo >>$(TMP)_$*_ "  $(CAT) $(TMP)_$*"
-	$(HIDDEN)echo >>$(TMP)_$*_ "  QUIT $$X"
+	$(HIDDEN)echo >>$(TMP)_$*_ "  QUIT *$$X"
 	$(HIDDEN)echo >>$(TMP)_$*_ "ENDIF"
 	$(HIDDEN)execute $(TMP)_$*_
 else
