@@ -4,10 +4,10 @@
 
 CC          := vc +morphos
 CPU         := ppc
-OS          := mos
+OS          := morphos
 RUNNING_AOS := 1
 
-ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.vbcc-mos)
+ifneq ($(lastword $(MAKEFILE_LIST)),Makefile.vbcc-mos)
 MAKEFILE_LIST += Makefile.vbcc-mos
 endif
 include Makefile.vbcc

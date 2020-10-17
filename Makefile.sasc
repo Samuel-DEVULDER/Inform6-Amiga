@@ -5,8 +5,10 @@
 CC          := sc
 EXT         := sasc
 LDOBJS       = $(OBJDIR)/\#?
+OS           = kick2x
+RUNNING_AOS  = 1
 
-ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.sasc)
+ifneq ($(lastword $(MAKEFILE_LIST)),Makefile.sasc)
 MAKEFILE_LIST += Makefile.sasc
 endif
 

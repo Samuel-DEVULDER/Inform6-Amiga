@@ -3,9 +3,9 @@
 ###############################################################################
 
 CC  := /opt/amiga/bin/m68k-amigaos-gcc
-OS  := AmigaOS
+OS  := kick13
 
-ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.650)
+ifneq ($(lastword $(MAKEFILE_LIST)),Makefile.650)
 MAKEFILE_LIST += Makefile.650
 endif
 
@@ -15,3 +15,4 @@ OFLAGS = -Ofast
 
 # there do not seem to be any support for stackexend, so ignore it
 STACKEXTEND =
+LDFLAGS += -m$(CPU) -Wl,--allow-multiple-definition

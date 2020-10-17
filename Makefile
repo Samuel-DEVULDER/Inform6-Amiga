@@ -11,15 +11,15 @@ PROG = Inform6
 ##############################################################################
 
 # some version of make does not maintain the list of makefile. 
-ifneq ($(lastword $(MAKEFILE_LIST)), Makefile)
+ifneq ($(lastword $(MAKEFILE_LIST)),Makefile)
 MAKEFILE_LIST += Makefile
 endif
 
 # override CC default for gcc (or else -dumpversion will fail)
-ifeq ($(origin CC), default)
+ifeq ($(origin CC),default)
 CC           = gcc
 endif
-ifeq ($(origin OS), undefined)
+ifeq ($(origin OS),undefined)
 OS          := $(shell uname)
 endif
 
@@ -41,11 +41,15 @@ SECONDS      = echo $(NOLINE) `$(DATE) +%s`
 # sets RUNNING_AOS to 1 when running out of unix context 
 ifeq ($(OS),)
 RUNNING_AOS  = 1
-OS          := AmigaOS
+endif
+
+ifeq ($(OS),AmigaOS)
+OS          := kick13
 endif
 
 # replace unix commands by amiga (native) ones 
 ifeq ($(RUNNING_AOS),1)
+OS          := kick13
 TMP          = t:
 NIL          = nil:
 CAT          = c:type
@@ -61,7 +65,7 @@ SECONDS      = sys:rexxc/rx "say time(s)"
 endif
 
 # EXT defines the compiler-suffix
-ifeq ($(origin EXT), undefined) # for some reason ?= doesn't work here
+ifeq ($(origin EXT),undefined) # for some reason ?= doesn't work here
 EXT         := $(notdir $(CC))-$(shell $(CC) -dumpversion)
 endif
 
@@ -85,15 +89,14 @@ COMPILE_TO   = -c -o
 LINK_TO      = -o
 
 # Default AMIGA options (mainly for GCC)
-ifeq ($(OS),AmigaOS)
-OS          := aos
+ifeq ($(OS),kick13)
 ifeq ($(CPU),)
 CPU         := 68030
 endif
 STACKEXTEND  = -mstackextend
 DEFINES      = -DAMIGA
-OFLAGS      += -m$(CPU) -msoft-float
-LIBS        += -lstack -noixemul
+OFLAGS      += -m$(CPU)
+LIBS        += -lstack -mcrt=nix13 -noixemul
 CFLAGS      += $(STACKEXTEND)
 endif
 
@@ -103,7 +106,7 @@ CPU         ?= $(shell uname -m)
 endif
 
 # compiler-dependant object directory
-ifeq ($(origin OBJDIR), undefined) # for some reason ?= doesn't work here
+ifeq ($(origin OBJDIR),undefined) # for some reason ?= doesn't work here
 OBJDIR      := objs-$(EXT)-$(CPU:68%=%)
 endif
 
@@ -286,7 +289,8 @@ do_tst_%:
 	$(TMAKE) tstart
 	$(HIDDEN)$(INFO) $(NOLINE) Testing $(EXE) $(subst _, , $(subst -slash-,/,$*))...
 ifeq ($(RUNNING_AOS),1)
-	$(HIDDEN)echo  >$(TMP)_$*_ "$(EXE) >$(TMP)_$* +test/Library $(TST_$*) $(subst _, , $(subst -slash-,/,$*))"
+	$(HIDDEN)echo >$(TMP)_$*_ "Stack 4096"
+	$(HIDDEN)echo >>$(TMP)_$*_ "$(EXE) >$(TMP)_$* +test/Library $(TST_$*) $(subst _, , $(subst -slash-,/,$*))"
 	$(HIDDEN)echo >>$(TMP)_$*_ "SET X $$RC"
 	$(HIDDEN)echo >>$(TMP)_$*_ "IF NOT $$X EQ 0"
 	$(HIDDEN)echo >>$(TMP)_$*_ "  $(CAT) $(TMP)_$*"
@@ -295,15 +299,16 @@ ifeq ($(RUNNING_AOS),1)
 	$(HIDDEN)execute $(TMP)_$*_
 else
 	$(HIDDEN)./$(EXE) >$(TMP)_$* +test/Library $(TST_$*) \
-		$(subst _, , $(subst -slash-,/,$*)) || (echo && $(CAT) $(TMP)_$* && fail)
+		$(subst _, , $(subst -slash-,/,$*)) || (echo && $(CAT) $(TMP)_$* && false)
 endif
 	$(TMAKE) tstop_ok
 	-$(HIDDEN)$(POST_TEST)
 	$(HIDDEN)$(RM) $(TMP)_* $(subst -h,,$(*:-v5_test-slash-%.inf=%.z5))
 
+OS2 = $(shell uname)
 do_tst_version: compile
 	$(HIDDEN)$(INFO) $(NOLINE) Testing version...
-ifneq ($(EXE:%.exe=1),1)
+ifneq ($(OS2:Windows%=Win),Win)
 	$(HIDDEN)c:version $(EXE) full
 else 
 # emulate
@@ -316,16 +321,19 @@ endif
 
 %_all all_%: sc_% vbcc_% ade_% gg_%
 	@rm t:_ >NIL:
-	@$(INFO) done "$*" with all compilers...
+	@$(INFO) done "$*" with all compilers (CPU=$(CPU)).
 	
 all_cpus_%: 
 	$(MAKE) all_$* CPU=68000 VERBOSE=$(VERBOSE)
 	$(MAKE) all_$* CPU=68020 VERBOSE=$(VERBOSE)
-	$(MAKE) all_$* CPU=68030 VERBOSE=$(VERBOSE)
 	$(MAKE) all_$* CPU=68040 VERBOSE=$(VERBOSE)
 	$(MAKE) all_$* CPU=68060 VERBOSE=$(VERBOSE)
+	@$(INFO) done "$*" with all cpus.
 
 vbcc_%:
+	$(HIDDEN)$(INFO) "###################"
+	$(HIDDEN)$(INFO) "Compiling with VBCC"
+	$(HIDDEN)$(INFO) "###################"
 	-@Mount PIPE:
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "assign c: vbcc:bin add"
@@ -336,6 +344,9 @@ vbcc_%:
 	@c:delete quiet t:_ >NIL:
 
 ade_%:
+	$(HIDDEN)$(INFO) "##################"
+	$(HIDDEN)$(INFO) "Compiling with ADE"
+	$(HIDDEN)$(INFO) "##################"
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "assign IXPIPE: dismount >NIL: "
 	@echo >> t:_ "assign PIPE:   dismount >NIL: "
@@ -355,6 +366,9 @@ ade_%:
 	@c:delete quiet t:_ >NIL:
 
 gg_%:	
+	$(HIDDEN)$(INFO) "#################"
+	$(HIDDEN)$(INFO) "Compiling with GG"
+	$(HIDDEN)$(INFO) "#################"
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "delete RAM:GG-datestamp >NIL: "
 	@echo >> t:_ "assign IXPIPE: dismount >NIL: "
@@ -369,6 +383,9 @@ gg_%:
 	@c:delete quiet t:_ >NIL:
 
 sc_%:
+	$(HIDDEN)$(INFO) "####################"
+	$(HIDDEN)$(INFO) "Compiling with SAS/C"
+	$(HIDDEN)$(INFO) "####################"
 	@echo >  t:_ "FailAt 20"
 	@echo >> t:_ "execute s:_sc >NIL: "
 	@echo >> t:_ "$(MAKE) -f Makefile.sasc $* VERBOSE=$(VERBOSE) CPU=$(CPU)"

@@ -1,3 +1,3 @@
-688
+6
 ;
-#define REVISION 688
+#define REVISION 6

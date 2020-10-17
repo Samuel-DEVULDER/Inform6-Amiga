@@ -1,6 +1,11 @@
 #include <stdio.h>
 
 #ifdef __SASC
+__near 
+#endif
+unsigned long __stack = 128*1024; /* 128kb stack should be enough */
+
+#ifdef __SASC
 int isnan(double d) {
 	return d!=d;
 }
@@ -36,8 +41,6 @@ int snprintf (char *str, size_t n, const char *format, ...) {
 
 #else
 
-unsigned long __stack = 128*1024; /* 128kb stack should be enough */
-
 unsigned long __stk_minframe = 256*1024;
 unsigned long __stk_safezone = 128*1024;
 
@@ -62,9 +65,17 @@ double frexp(double x,int * nptr)
 		return x * s;
 
 }
+static double pow2(int exp) 
+{
+	double x = 1, y=2;
+	if(exp<0) return 1/pow2(-exp);
+	for(; exp>0; exp>>=1, y*=y) if(exp & 1) x *= y;
+	return x;
+}
 double ldexp(double x, int exp)
 {
-        return x*pow(2.0,exp);
+		
+        return pow2(exp)*x;
 }
 #endif
 

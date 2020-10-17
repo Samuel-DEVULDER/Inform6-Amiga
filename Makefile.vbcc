@@ -10,7 +10,7 @@ error:
 	@fail
 endif
 
-ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.vbcc)
+ifneq ($(lastword $(MAKEFILE_LIST)),Makefile.vbcc)
 MAKEFILE_LIST += Makefile.vbcc
 endif
 

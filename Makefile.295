@@ -4,7 +4,7 @@
 
 CC  = ADE:bin/gcc
 
-ifneq ($(lastword $(MAKEFILE_LIST)), Makefile.295)
+ifneq ($(lastword $(MAKEFILE_LIST)),Makefile.295)
 MAKEFILE_LIST += Makefile.295
 endif
 
