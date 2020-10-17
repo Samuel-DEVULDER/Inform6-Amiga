@@ -41,6 +41,7 @@ SECONDS      = echo $(NOLINE) `$(DATE) +%s`
 # sets RUNNING_AOS to 1 when running out of unix context 
 ifeq ($(OS),)
 RUNNING_AOS  = 1
+OS          := kick13
 endif
 
 ifeq ($(OS),AmigaOS)
@@ -49,7 +50,6 @@ endif
 
 # replace unix commands by amiga (native) ones 
 ifeq ($(RUNNING_AOS),1)
-OS          := kick13
 TMP          = t:
 NIL          = nil:
 CAT          = c:type
