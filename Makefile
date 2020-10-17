@@ -291,8 +291,8 @@ do_tst_%:
 ifeq ($(RUNNING_AOS),1)
 	$(HIDDEN)echo >$(TMP)_$*_ "Stack 4096"
 	$(HIDDEN)echo >>$(TMP)_$*_ "$(EXE) >$(TMP)_$* +test/Library $(TST_$*) $(subst _, , $(subst -slash-,/,$*))"
-	$(HIDDEN)echo >>$(TMP)_$*_ "SET X $$RC"
-	$(HIDDEN)echo >>$(TMP)_$*_ "IF NOT $$X EQ 0"
+	$(HIDDEN)echo >>$(TMP)_$*_ "SET X *$$RC"
+	$(HIDDEN)echo >>$(TMP)_$*_ "IF NOT *$$X EQ 0"
 	$(HIDDEN)echo >>$(TMP)_$*_ "  $(CAT) $(TMP)_$*"
 	$(HIDDEN)echo >>$(TMP)_$*_ "  QUIT $$X"
 	$(HIDDEN)echo >>$(TMP)_$*_ "ENDIF"
