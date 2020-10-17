@@ -37,19 +37,22 @@ RM           = rm >$(NIL) 2>&1
 EXPR         = expr
 EXPR_TAIL    = || true # because expr returns error codes
 SECONDS      = echo $(NOLINE) `$(DATE) +%s`
+SLEEP        = sleep
 
 # sets RUNNING_AOS to 1 when running out of unix context 
 ifeq ($(OS),)
 RUNNING_AOS  = 1
-OS          := kick13
 endif
 
-ifeq ($(OS),AmigaOS)
-OS          := kick13
+ifeq ($(CC),sc)
+RUNNING_AOS  = 1
 endif
 
 # replace unix commands by amiga (native) ones 
 ifeq ($(RUNNING_AOS),1)
+ifeq ($(OS),)
+OS          := ks13
+endif
 TMP          = t:
 NIL          = nil:
 CAT          = c:type
@@ -62,6 +65,11 @@ NOLINE       = noline
 EXPR         = c:eval
 EXPR_TAIL    =
 SECONDS      = sys:rexxc/rx "say time(s)"
+SLEEP        = c:wait
+endif
+
+ifeq ($(OS),AmigaOS)
+OS          := ks13
 endif
 
 # EXT defines the compiler-suffix
@@ -89,7 +97,7 @@ COMPILE_TO   = -c -o
 LINK_TO      = -o
 
 # Default AMIGA options (mainly for GCC)
-ifeq ($(OS),kick13)
+ifeq ($(OS),ks13)
 ifeq ($(CPU),)
 CPU         := 68030
 endif
@@ -241,12 +249,10 @@ echo_%:
 relink: touch compile
 
 touch:
-	$(TOUCH) $(MAKEFILE_LIST)
-	-@sleep 1
-	-@c:wait 1
-	$(TOUCH) $(OBJDIR)/*.o 
-	-@sleep 1
-	-@c:wait 1
+	$(TOUCH) Makefile*
+	-@$(SLEEP) 1
+	$(TOUCH) objs-*/*
+	-@$(SLEEP) 1
 
 .PHONY: tstart
 TMP_TIME1 = $(TMP).time1-$(EXT)
@@ -282,7 +288,8 @@ do_tst_fill:
 		http://inform-fiction.org/examples/index.html
 
 do_tst_all_%:
-	@$(MAKE) -s EXE=$(EXE) HIDDEN=$(HIDDEN) TMP=$(TMP) \
+	@$(MAKE) -f $(firstword $(MAKEFILE_LIST)) -s \
+		EXE=$(EXE) HIDDEN=$(HIDDEN) TMP=$(TMP) \
 		$(subst /,-slash-,$(addprefix do_tst_$*_,$(wildcard test/*.inf)))
 
 do_tst_%:
@@ -305,14 +312,19 @@ endif
 	-$(HIDDEN)$(POST_TEST)
 	$(HIDDEN)$(RM) $(TMP)_* $(subst -h,,$(*:-v5_test-slash-%.inf=%.z5))
 
-OS2 = $(shell uname)
+ifeq ($(RUNNING_AOS),1)
+HAVE_C_VERSION = 1
+endif
+ifneq ("$(wildcard /C/Version*)","")
+HAVE_C_VERSION = 1
+endif
+
 do_tst_version: compile
 	$(HIDDEN)$(INFO) $(NOLINE) Testing version...
-ifneq ($(OS2:Windows%=Win),Win)
+ifeq ($(HAVE_C_VERSION),1)
 	$(HIDDEN)c:version $(EXE) full
 else 
-# emulate
-	$(HIDDEN)strings "$(EXE)" | grep '$VER: ' | sed -e 's%[)] %)\n%'
+	$(HIDDEN)strings "$(EXE)" | grep '$VER: ' | sed -e "s%[)] %)\n%"
 endif
 	
 ###############################################################################

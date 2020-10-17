@@ -4,10 +4,10 @@
 
 ifneq ("$(wildcard vbcc:config/kick13)","")
 CC          := vc +kick13
-OS          := kick13
+OS          := ks13
 else
 CC          := vc +aos68k
-OS          := kick2x
+OS          := ks2x
 endif
 
 RUNNING_AOS := 1

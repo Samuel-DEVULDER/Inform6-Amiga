@@ -3,7 +3,7 @@
 ###############################################################################
 
 CC  := gg:bin/gcc
-OS  := AmigaOS
+#OS  := AmigaOS
 
 ifneq ($(lastword $(MAKEFILE_LIST)),Makefile.322)
 MAKEFILE_LIST += Makefile.322
