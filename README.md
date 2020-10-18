@@ -12,7 +12,7 @@ Applications:Inform6.34> version Inform6-vbcc-ppc.morphos full
 Inform 6.34 of 21st May 2020 (17/10/20)
 Build #862 (Oct 17 2020) for morphos/ppc by Samuel DEVULDER with vbcc
 
-Applications:Inform6.34> version Inform6-gcc-2.95.3-68000.ks13  full
+Applications:Inform6.34> version Inform6-gcc-2.95.3-68000.ks13 full
 Inform 6.34 of 21st May 2020 (17/10/20)
 Build #855 (Oct 17 2020) for ks13/68000 by Samuel DEVULDER with gcc-2.95.3
 ```
