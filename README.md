@@ -168,6 +168,10 @@ Many compilers are supported:
 * Probably all gcc-flavours on unix-like systems (e.g. cygwin)
 * [SAS/C](http://www.pjhutchison.org/tutorial/sas_c.html) 6.58
 
+# Interpreter
+
+If you are looking for a Z-code interpreter, you can have a look at (this one)[https://github.com/Samuel-DEVULDER/JZip21-Amiga] for the amiga ;)
+
 # Source
 
 Source is available on: https://github.com/Samuel-DEVULDER/Inform6-Amiga
