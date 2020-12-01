@@ -170,7 +170,7 @@ Many compilers are supported:
 
 # Interpreter
 
-If you are looking for a Z-code interpreter, you can have a look at (this one)[https://github.com/Samuel-DEVULDER/JZip21-Amiga] for the amiga ;)
+If you are looking for a Z-machine byte-code interpreter, you can have a look at [this one](https://github.com/Samuel-DEVULDER/JZip21-Amiga) which has just popped up for the amiga ;)
 
 # Source
 
